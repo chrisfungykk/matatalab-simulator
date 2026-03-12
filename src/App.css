@@ -4,10 +4,10 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
   max-width: 1920px;
   margin: 0 auto;
   padding: 0;
-  box-sizing: border-box;
 }
 
 /* ── Toolbar ─────────────────────────────────────────────────────── */
@@ -16,9 +16,9 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-  padding: 0.5rem 1rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-sm) var(--spacing-md);
   flex-shrink: 0;
 }
 
@@ -27,94 +27,153 @@
 .app-main {
   display: flex;
   flex: 1;
-  gap: 1rem;
-  padding: 1rem;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
   min-height: 0;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* ── Grid Map Panel (left side on desktop) ───────────────────────── */
+/* ── Grid Map Panel ──────────────────────────────────────────────── */
 
 .app-grid-panel {
-  flex: 1 1 50%;
-  min-width: 0;
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  min-width: 0;
 }
 
 /* ── Right Panel: ControlBoard + BlockInventory ──────────────────── */
 
 .app-right-panel {
-  flex: 1 1 50%;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--spacing-md);
+  min-width: 0;
 }
 
 .app-control-board {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .app-block-inventory {
   flex: 0 0 auto;
 }
 
-/* ── Challenge Selector (sidebar/footer) ─────────────────────────── */
+/* ── Challenge Selector ──────────────────────────────────────────── */
 
 .app-challenges {
-  border-top: 1px solid #dee2e6;
-  padding: 0.75rem 1rem;
-  background: #f8f9fa;
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
   flex-shrink: 0;
 }
 
-/* ── Responsive: Stacked layout for < 1024px ─────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE FIRST: < 768px (phones)
+   Stack everything vertically, compact spacing
+   ═══════════════════════════════════════════════════════════════════ */
 
-@media (max-width: 1023px) {
+.app-main {
+  flex-direction: column;
+  padding: var(--spacing-sm);
+  gap: var(--spacing-sm);
+}
+
+.app-grid-panel {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.app-right-panel {
+  flex: 0 0 auto;
+  width: 100%;
+  gap: var(--spacing-sm);
+}
+
+.app-challenges {
+  padding: var(--spacing-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLET PORTRAIT: 768px – 1023px (iPad portrait, Android tablets)
+   Still stacked but with more breathing room
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
   .app-main {
     flex-direction: column;
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
   }
 
   .app-grid-panel {
-    flex: 0 0 auto;
-    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
   }
 
   .app-right-panel {
-    flex: 0 0 auto;
-    width: 100%;
+    gap: var(--spacing-md);
+  }
+
+  .app-challenges {
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 }
 
-/* ── Desktop: side-by-side for >= 1024px ─────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   TABLET LANDSCAPE / SMALL DESKTOP: 1024px+
+   Side-by-side layout
+   ═══════════════════════════════════════════════════════════════════ */
 
 @media (min-width: 1024px) {
   .app-main {
     flex-direction: row;
+    padding: var(--spacing-lg);
+    gap: var(--spacing-lg);
   }
 
   .app-grid-panel {
-    flex: 1 1 50%;
+    flex: 1 1 45%;
     max-width: 50%;
+    margin: 0;
   }
 
   .app-right-panel {
-    flex: 1 1 50%;
+    flex: 1 1 55%;
     max-width: 50%;
   }
 }
 
-/* ── Ensure no overlap at 768–1920px ─────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   LARGE DESKTOP: 1440px+
+   ═══════════════════════════════════════════════════════════════════ */
 
-@media (min-width: 768px) {
-  .app-grid-panel,
-  .app-control-board,
-  .app-block-inventory {
-    overflow: auto;
-    box-sizing: border-box;
+@media (min-width: 1440px) {
+  .app-main {
+    padding: var(--spacing-xl);
+    gap: var(--spacing-xl);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SAFE AREA INSETS (notched devices)
+   ═══════════════════════════════════════════════════════════════════ */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .app {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .app-toolbar {
+    padding-top: max(var(--spacing-sm), env(safe-area-inset-top));
+  }
+
+  .app-challenges {
+    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom));
   }
 }

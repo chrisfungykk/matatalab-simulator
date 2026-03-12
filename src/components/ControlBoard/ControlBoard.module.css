@@ -1,8 +1,8 @@
 .controlBoard {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
   background-color: #fafafa;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -21,12 +21,14 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  min-height: 48px;
-  padding: 6px 8px;
+  min-height: 52px;
+  padding: 8px;
   border: 2px dashed #ccc;
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: #fff;
   flex-wrap: wrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .programLine.mainLine {
@@ -54,15 +56,18 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 10px;
+  padding: 8px 12px;
+  min-height: var(--min-touch-target);
   border: 2px solid transparent;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: grab;
   user-select: none;
   font-size: 0.85rem;
   font-weight: 500;
   transition: opacity 0.2s, box-shadow 0.2s, outline 0.2s;
   position: relative;
+  touch-action: none; /* required for dnd-kit on touch devices */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .boardBlock:focus-visible {
@@ -119,12 +124,8 @@
 }
 
 @keyframes executePulse {
-  0%, 100% {
-    outline-color: #2196f3;
-  }
-  50% {
-    outline-color: #90caf9;
-  }
+  0%, 100% { outline-color: #2196f3; }
+  50% { outline-color: #90caf9; }
 }
 
 /* ── Error highlight ───────────────────────────────────────────────── */
@@ -136,26 +137,22 @@
 }
 
 @keyframes errorFlash {
-  0%, 100% {
-    outline-color: #f44336;
-  }
-  50% {
-    outline-color: transparent;
-  }
+  0%, 100% { outline-color: #f44336; }
+  50% { outline-color: transparent; }
 }
 
 /* ── Drop zone between blocks ──────────────────────────────────────── */
 
 .dropZone {
   width: 8px;
-  min-height: 36px;
+  min-height: 40px;
   border-radius: 4px;
   transition: width 0.15s, background-color 0.15s;
   flex-shrink: 0;
 }
 
 .dropZone.dropZoneActive {
-  width: 24px;
+  width: 28px;
   background-color: #bbdefb;
   border: 2px dashed #2196f3;
 }
@@ -167,4 +164,39 @@
   color: #999;
   font-style: italic;
   padding: 4px 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE: < 768px
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  .controlBoard {
+    padding: var(--spacing-sm);
+  }
+
+  .programLine {
+    padding: 6px;
+    min-height: 48px;
+    gap: 3px;
+  }
+
+  .boardBlock {
+    padding: 6px 8px;
+    font-size: 0.78rem;
+  }
+
+  .lineLabel {
+    font-size: 0.7rem;
+    min-width: 50px;
+  }
+
+  .dropZone {
+    width: 6px;
+    min-height: 36px;
+  }
+
+  .dropZone.dropZoneActive {
+    width: 20px;
+  }
 }

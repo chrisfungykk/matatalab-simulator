@@ -13,6 +13,7 @@ import ControlBoard from './components/ControlBoard/ControlBoard';
 import BlockInventory from './components/BlockInventory/BlockInventory';
 import Toolbar from './components/Toolbar/Toolbar';
 import ChallengeSelector from './components/ChallengeSelector/ChallengeSelector';
+import ErrorDisplay from './components/ErrorDisplay/ErrorDisplay';
 import './App.css';
 
 // ── Simulator Context ───────────────────────────────────────────────
@@ -287,6 +288,12 @@ function App() {
                 language={state.language}
               />
             </aside>
+
+            <ErrorDisplay
+              errorInfo={state.execution.errorInfo}
+              goalReached={state.execution.goalReached}
+              executionStatus={state.execution.status}
+            />
           </div>
         </DndContext>
       </SimulatorContext.Provider>

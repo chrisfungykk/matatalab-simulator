@@ -37,8 +37,8 @@ export const GridMap: React.FC<GridMapProps> = ({
   const { width, height } = gridSize;
 
   const gridStyle: React.CSSProperties = {
-    gridTemplateColumns: `repeat(${width}, minmax(40px, 1fr))`,
-    gridTemplateRows: `repeat(${height}, minmax(40px, 1fr))`,
+    gridTemplateColumns: `repeat(${width}, 1fr)`,
+    gridTemplateRows: `repeat(${height}, 1fr)`,
   };
 
   const renderedCells: React.ReactNode[] = [];

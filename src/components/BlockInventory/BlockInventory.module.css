@@ -1,8 +1,8 @@
 .inventory {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
   background-color: #fafafa;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -18,22 +18,25 @@
 .grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .block {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 8px 12px;
+  min-height: var(--min-touch-target);
   border: 2px solid transparent;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: grab;
   user-select: none;
   font-size: 0.85rem;
   font-weight: 500;
   transition: opacity 0.2s, box-shadow 0.2s;
   position: relative;
+  touch-action: none; /* required for dnd-kit on touch devices */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .block:focus-visible {
@@ -43,6 +46,10 @@
 
 .block:hover:not(.disabled) {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.block:active:not(.disabled) {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* ── Category colours ──────────────────────────────────────────────── */
@@ -100,12 +107,38 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
+  min-width: 22px;
+  height: 22px;
   padding: 0 5px;
-  border-radius: 10px;
+  border-radius: 11px;
   background-color: rgba(0, 0, 0, 0.12);
   font-size: 0.75rem;
   font-weight: 700;
   line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE: < 768px — smaller blocks, tighter grid
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  .inventory {
+    padding: var(--spacing-sm);
+  }
+
+  .grid {
+    gap: 4px;
+  }
+
+  .block {
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    gap: 4px;
+  }
+
+  .badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+  }
 }
