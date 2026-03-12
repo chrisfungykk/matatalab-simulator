@@ -142,8 +142,6 @@ describe('Property 5: Random number block produces value in [1, 6]', () => {
       fc.property(directionArb, (direction) => {
         // Start in the middle of a 10x10 grid facing the direction
         // With enough room for up to 6 cells of movement
-        const startPos: Position = { row: 5, col: 5 };
-
         // Use a grid large enough that 6 steps in any direction won't hit boundary
         // 20x20 grid, starting at (10,10) gives 10 cells of room in every direction
         const grid = makeGrid({ width: 20, height: 20 });
