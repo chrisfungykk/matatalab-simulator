@@ -1,6 +1,16 @@
-import React, { useReducer, useCallback, useEffect, useRef, createContext, useContext } from 'react';
-import { I18nextProvider } from 'react-i18next';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import React, { useReducer, useCallback, useEffect, useRef, createContext, useContext, useState } from 'react';
+import { I18nextProvider, useTranslation } from 'react-i18next';
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  KeyboardSensor,
+} from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import i18n from './i18n';
 import { simulatorReducer, createInitialState } from './core/simulatorReducer';
 import { createExecutor } from './core/executor';
@@ -15,6 +25,75 @@ import Toolbar from './components/Toolbar/Toolbar';
 import ChallengeSelector from './components/ChallengeSelector/ChallengeSelector';
 import ErrorDisplay from './components/ErrorDisplay/ErrorDisplay';
 import './App.css';
+
+// ── Drag overlay ────────────────────────────────────────────────────
+
+const BLOCK_I18N_KEY: Record<string, string> = {
+  forward: 'block.forward',
+  backward: 'block.backward',
+  turn_left: 'block.turnLeft',
+  turn_right: 'block.turnRight',
+  loop_begin: 'block.loopBegin',
+  loop_end: 'block.loopEnd',
+  function_define: 'block.functionDefine',
+  function_call: 'block.functionCall',
+  number_2: 'block.number2',
+  number_3: 'block.number3',
+  number_4: 'block.number4',
+  number_5: 'block.number5',
+  number_random: 'block.numberRandom',
+  fun_random_move: 'block.funRandomMove',
+  fun_music: 'block.funMusic',
+  fun_dance: 'block.funDance',
+};
+
+const BLOCK_CATEGORY_STYLES: Record<string, { background: string; border: string; color: string }> = {
+  motion:   { background: '#bbdefb', border: '#64b5f6', color: '#0d47a1' },
+  loop:     { background: '#fff9c4', border: '#fdd835', color: '#f57f17' },
+  function: { background: '#c8e6c9', border: '#66bb6a', color: '#1b5e20' },
+  number:   { background: '#e1bee7', border: '#ab47bc', color: '#4a148c' },
+  fun:      { background: '#ffe0b2', border: '#ffa726', color: '#e65100' },
+};
+
+function getBlockCategory(blockType: string): string {
+  if (['forward', 'backward', 'turn_left', 'turn_right'].includes(blockType)) return 'motion';
+  if (['loop_begin', 'loop_end'].includes(blockType)) return 'loop';
+  if (['function_define', 'function_call'].includes(blockType)) return 'function';
+  if (blockType.startsWith('number_')) return 'number';
+  return 'fun';
+}
+
+interface DragOverlayBlockProps {
+  blockType: string;
+}
+
+const DragOverlayBlock: React.FC<DragOverlayBlockProps> = ({ blockType }) => {
+  const { t } = useTranslation();
+  const category = getBlockCategory(blockType);
+  const catStyle = BLOCK_CATEGORY_STYLES[category] ?? BLOCK_CATEGORY_STYLES.motion;
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '8px 12px',
+        background: catStyle.background,
+        border: `2px solid ${catStyle.border}`,
+        color: catStyle.color,
+        borderRadius: '8px',
+        fontWeight: 500,
+        fontSize: '0.85rem',
+        cursor: 'grabbing',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+        userSelect: 'none',
+        whiteSpace: 'nowrap',
+        pointerEvents: 'none',
+      }}
+    >
+      {t(BLOCK_I18N_KEY[blockType] ?? blockType, { defaultValue: blockType })}
+    </div>
+  );
+};
 
 // ── Simulator Context ───────────────────────────────────────────────
 
@@ -35,6 +114,21 @@ export function useSimulator(): SimulatorContextValue {
 
 function App() {
   const [state, dispatch] = useReducer(simulatorReducer, undefined, createInitialState);
+
+  // ── Active drag tracking ────────────────────────────────────────
+  const [activeDragData, setActiveDragData] = useState<{ blockType?: string } | null>(null);
+
+  // ── Sensors ─────────────────────────────────────────────────────
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   // ── Execution animation loop ────────────────────────────────────
   const executorRef = useRef<ProgramExecutor | null>(null);
@@ -122,7 +216,12 @@ function App() {
   }, [state.execution.status]);
 
   // ── Drag-and-drop handler ───────────────────────────────────────
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveDragData(event.active.data.current ? (event.active.data.current as { blockType?: string }) : null);
+  }, []);
+
   const handleDragEnd = useCallback((event: DragEndEvent) => {
+    setActiveDragData(null);
     const { active, over } = event;
     const activeData = active.data.current;
     if (!activeData) return;
@@ -227,7 +326,7 @@ function App() {
   return (
     <I18nextProvider i18n={i18n}>
       <SimulatorContext.Provider value={{ state, dispatch }}>
-        <DndContext onDragEnd={handleDragEnd}>
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div className="app">
             <header className="app-toolbar">
               <Toolbar
@@ -295,6 +394,12 @@ function App() {
               executionStatus={state.execution.status}
             />
           </div>
+
+          <DragOverlay dropAnimation={null}>
+            {activeDragData?.blockType ? (
+              <DragOverlayBlock blockType={activeDragData.blockType} />
+            ) : null}
+          </DragOverlay>
         </DndContext>
       </SimulatorContext.Provider>
     </I18nextProvider>
