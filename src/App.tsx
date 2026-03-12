@@ -3,7 +3,7 @@ import { I18nextProvider } from 'react-i18next';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import i18n from './i18n';
 import { simulatorReducer, createInitialState } from './core/simulatorReducer';
-import { createExecutor, checkGoalConditions } from './core/executor';
+import { createExecutor } from './core/executor';
 import type { ProgramExecutor } from './core/executor';
 import type { SimulatorState, SimulatorAction, ChallengeConfig, SpeedSetting, ControlBoardState } from './core/types';
 import { SPEED_DELAYS } from './core/types';
