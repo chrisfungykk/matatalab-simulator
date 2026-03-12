@@ -1,0 +1,31 @@
+{
+  "id": "easy-1",
+  "title": {
+    "zh": "直線前進",
+    "en": "Straight Forward"
+  },
+  "difficulty": "easy",
+  "grid": { "width": 4, "height": 4 },
+  "start": { "row": 0, "col": 0, "direction": "east" },
+  "goals": [{ "row": 0, "col": 3 }],
+  "obstacles": [],
+  "collectibles": [],
+  "blockInventory": {
+    "forward": 4,
+    "backward": 4,
+    "turn_left": 4,
+    "turn_right": 4,
+    "loop_begin": 2,
+    "loop_end": 2,
+    "function_define": 1,
+    "function_call": 3,
+    "number_2": 2,
+    "number_3": 2,
+    "number_4": 2,
+    "number_5": 2,
+    "number_random": 2,
+    "fun_random_move": 1,
+    "fun_music": 1,
+    "fun_dance": 1
+  }
+}

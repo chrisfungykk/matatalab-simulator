@@ -1,0 +1,74 @@
+{
+  "block": {
+    "forward": "Forward",
+    "backward": "Backward",
+    "turnLeft": "Turn Left",
+    "turnRight": "Turn Right",
+    "loopBegin": "Loop Begin",
+    "loopEnd": "Loop End",
+    "functionDefine": "Define Function",
+    "functionCall": "Call Function",
+    "funRandomMove": "Random Move",
+    "funMusic": "Music",
+    "funDance": "Dance",
+    "number2": "Number 2",
+    "number3": "Number 3",
+    "number4": "Number 4",
+    "number5": "Number 5",
+    "numberRandom": "Random Number"
+  },
+  "ui": {
+    "run": "Run",
+    "reset": "Reset",
+    "save": "Save",
+    "load": "Load",
+    "speed": "Speed",
+    "slow": "Slow",
+    "normal": "Normal",
+    "fast": "Fast",
+    "language": "Language",
+    "timer": "Timer",
+    "timerStart": "Start Timer",
+    "timerStop": "Stop Timer",
+    "timerDuration": "Duration",
+    "seconds": "sec",
+    "start": "Start",
+    "stop": "Stop",
+    "challenges": "Challenges",
+    "blockInventory": "Block Inventory",
+    "controlBoard": "Control Board",
+    "mainProgram": "Main Program",
+    "functionDefinition": "Function Definition",
+    "dropBlocksHere": "Drop blocks here",
+    "title": "Matatalab Coding Simulator"
+  },
+  "error": {
+    "unmatchedLoopBegin": "Loop Begin has no matching Loop End",
+    "unmatchedLoopEnd": "Loop End has no matching Loop Begin",
+    "missingLoopNumber": "Loop Begin is missing a Number Block",
+    "functionCallNoDefinition": "Function Call has no Function Definition",
+    "functionOnMainLine": "Function Definition cannot be on the main program line",
+    "numberOnTurn": "Number Block cannot be placed after a Turn block",
+    "boundary": "Robot moved out of map boundary",
+    "obstacle": "Robot collided with an obstacle",
+    "timerExpired": "Time is up"
+  },
+  "challenge": {
+    "success": "Challenge Complete!",
+    "failure": "Challenge Failed",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "toolbar": {
+    "savedSuccess": "Program saved",
+    "loadError": "Failed to load program: invalid JSON file",
+    "fileLabel": "Choose program file",
+    "downloadFilename": "matatalab-program.json"
+  }
+}
