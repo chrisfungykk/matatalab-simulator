@@ -54,3 +54,9 @@ body {
 button, [role="button"], input, select {
   touch-action: manipulation;
 }
+
+/* Prevent page scrolling while a drag-and-drop operation is active */
+body.is-dragging {
+  overflow: hidden;
+  touch-action: none;
+}

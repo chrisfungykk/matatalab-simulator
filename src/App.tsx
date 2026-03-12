@@ -218,10 +218,12 @@ function App() {
   // ── Drag-and-drop handler ───────────────────────────────────────
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveDragData(event.active.data.current ? (event.active.data.current as { blockType?: string }) : null);
+    document.body.classList.add('is-dragging');
   }, []);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     setActiveDragData(null);
+    document.body.classList.remove('is-dragging');
     const { active, over } = event;
     const activeData = active.data.current;
     if (!activeData) return;
@@ -278,6 +280,11 @@ function App() {
     }
   }, []);
 
+  const handleDragCancel = useCallback(() => {
+    setActiveDragData(null);
+    document.body.classList.remove('is-dragging');
+  }, []);
+
   // ── Toolbar callbacks ───────────────────────────────────────────
   const handleRun = useCallback(() => dispatch({ type: 'RUN_PROGRAM' }), []);
   const handleReset = useCallback(() => dispatch({ type: 'RESET' }), []);
@@ -326,7 +333,7 @@ function App() {
   return (
     <I18nextProvider i18n={i18n}>
       <SimulatorContext.Provider value={{ state, dispatch }}>
-        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
           <div className="app">
             <header className="app-toolbar">
               <Toolbar
