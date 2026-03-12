@@ -281,7 +281,7 @@ Build a client-side web simulator for the Matatalab Coding Set using TypeScript,
     - _Requirements: 9.1, 9.2_
 
 - [ ] 18. App shell, layout, and wiring
-  - [~] 18.1 Implement App shell and responsive layout
+  - [x] 18.1 Implement App shell and responsive layout
     - Create `src/App.tsx` wiring all components together
     - Provide `SimulatorState` via React context + `useReducer`
     - Provide i18n context via `I18nextProvider`
@@ -290,27 +290,27 @@ Build a client-side web simulator for the Matatalab Coding Set using TypeScript,
     - Ensure Grid_Map, Control_Board, and Block_Inventory panels do not overlap at 768–1920px widths
     - _Requirements: 15.1, 15.2, 15.3_
 
-  - [~] 18.2 Wire execution animation loop
+  - [x] 18.2 Wire execution animation loop
     - Implement `useEffect`-based animation loop: on `RUN_PROGRAM`, validate → start stepping with `setTimeout` delay based on `speed`
     - Apply speed changes immediately to next step delay
     - On boundary/obstacle error, stop loop and highlight causing block
     - On completion, check goal conditions
     - _Requirements: 7.2, 7.3, 7.6, 7.7, 16.2_
 
-- [ ] 19. Checkpoint - Full integration
+- [x] 19. Checkpoint - Full integration
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 20. Final polish and verification
-  - [~] 20.1 Add error message display component
+  - [x] 20.1 Add error message display component
     - Create a toast/notification component for displaying validation errors, runtime errors, and serialization errors in the active language
     - Wire error display to reducer error states
     - _Requirements: 5.3, 5.4, 5.5, 6.2, 7.6, 7.7, 13.5, 14.2_
 
-  - [~] 20.2 Verify all built-in challenges are playable end-to-end
+  - [x] 20.2 Verify all built-in challenges are playable end-to-end
     - Write integration tests that load each built-in challenge, execute a known-correct program, and assert success
     - _Requirements: 9.4, 9.5_
 
-- [ ] 21. Final checkpoint - All tests pass
+- [x] 21. Final checkpoint - All tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
