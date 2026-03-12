@@ -1,4 +1,29 @@
+# Dependencies
 node_modules
+
+# Build output
 dist
-*.local
+
+# Editor / IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Environment / local config
+*.local
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage
+
+# Vite
+*.sw?
