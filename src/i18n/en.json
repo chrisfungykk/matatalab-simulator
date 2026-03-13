@@ -17,6 +17,13 @@
     "number5": "Number 5",
     "numberRandom": "Random Number"
   },
+  "category": {
+    "motion": "Motion",
+    "loop": "Loop",
+    "function": "Function",
+    "number": "Number",
+    "fun": "Fun"
+  },
   "ui": {
     "run": "Run",
     "reset": "Reset",
@@ -40,7 +47,9 @@
     "mainProgram": "Main Program",
     "functionDefinition": "Function Definition",
     "dropBlocksHere": "Drop blocks here",
-    "title": "Matatalab Coding Simulator"
+    "title": "Matatalab Coding Simulator",
+    "dismiss": "Dismiss",
+    "selected": "Selected"
   },
   "error": {
     "unmatchedLoopBegin": "Loop Begin has no matching Loop End",

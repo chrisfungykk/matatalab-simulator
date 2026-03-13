@@ -1,8 +1,13 @@
+/* Import shared animation keyframes */
+@import '../animations.css';
+
 .grid {
   display: grid;
-  gap: 1px;
-  border: 2px solid #333;
-  background-color: #333;
+  gap: 0;
+  border: 2px solid var(--grid-cell-border, #d4e4c1);
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: var(--grid-cell-border, #d4e4c1);
   width: 100%;
   max-width: 100%;
   aspect-ratio: 1;
@@ -12,80 +17,91 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9f9f9;
+  background-color: var(--grid-cell-bg, #f0f7e6);
   position: relative;
   font-size: clamp(1rem, 3vw, 1.5rem);
   user-select: none;
   aspect-ratio: 1;
   min-width: 0;
   min-height: 0;
+  border: 1px solid var(--grid-cell-border, #d4e4c1);
+  border-radius: 6px;
 }
 
 .obstacle {
-  background-color: #e0d6c8;
+  background-color: var(--grid-obstacle-bg, #e8dcc8);
 }
 
 .goal {
-  background-color: #d4edda;
+  background-color: var(--grid-goal-bg, #d4edda);
 }
 
 .collectible {
-  background-color: #fff3cd;
+  background-color: var(--grid-collectible-bg, #fff8e1);
 }
 
-.bot {
+.startCell {
+  border: 2.5px solid var(--grid-start-border, #4caf50);
+  box-shadow: inset 0 0 6px rgba(76, 175, 80, 0.2);
+}
+
+/* ── Bot wrapper with position transition ─────────────────────────── */
+
+.botWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 70%;
   height: 70%;
-  transition: transform 0.3s ease;
+  position: relative;
 }
 
-.botArrow {
-  width: 0;
-  height: 0;
-  border-left: clamp(6px, 1.5vw, 12px) solid transparent;
-  border-right: clamp(6px, 1.5vw, 12px) solid transparent;
-  border-bottom: clamp(10px, 2.5vw, 20px) solid #2196f3;
+.botSvgContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.error .botArrow {
-  border-bottom-color: #f44336;
+.botSvgContainer svg {
+  width: 100%;
+  height: 100%;
 }
 
-.error {
-  animation: errorFlash 0.5s ease-in-out 3;
-  box-shadow: 0 0 0 3px #f44336;
-  border-radius: 4px;
+/* ── SVG illustrations ────────────────────────────────────────────── */
+
+.obstacleSvg,
+.goalSvg,
+.collectibleSvg {
+  width: 60%;
+  height: 60%;
+  display: block;
 }
 
-.animationIndicator {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  font-size: 0.6em;
-  line-height: 1;
+.goalSvg {
+  animation: goal-flag-wave 1.5s ease-in-out infinite;
 }
 
-@keyframes errorFlash {
-  0%, 100% { box-shadow: 0 0 0 3px #f44336; }
-  50% { box-shadow: 0 0 0 3px transparent; }
+.collectibleSvg {
+  animation: star-glow 2s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   TABLET: larger emoji/icons in cells
+   TABLET: larger icons in cells
    ═══════════════════════════════════════════════════════════════════ */
 
 @media (min-width: 768px) {
   .cell {
     font-size: clamp(1.2rem, 2.5vw, 2rem);
+    border-radius: 8px;
   }
 
-  .botArrow {
-    border-left-width: clamp(8px, 1.5vw, 14px);
-    border-right-width: clamp(8px, 1.5vw, 14px);
-    border-bottom-width: clamp(14px, 2.5vw, 24px);
+  .obstacleSvg,
+  .goalSvg,
+  .collectibleSvg {
+    width: 65%;
+    height: 65%;
   }
 }
 

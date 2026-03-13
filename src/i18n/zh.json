@@ -17,6 +17,13 @@
     "number5": "數字5",
     "numberRandom": "隨機數字"
   },
+  "category": {
+    "motion": "動作",
+    "loop": "迴圈",
+    "function": "函式",
+    "number": "數字",
+    "fun": "趣味"
+  },
   "ui": {
     "run": "執行",
     "reset": "重置",
@@ -40,7 +47,9 @@
     "mainProgram": "主程式",
     "functionDefinition": "函式定義",
     "dropBlocksHere": "將方塊拖放到這裡",
-    "title": "Matatalab 編程模擬器"
+    "title": "Matatalab 編程模擬器",
+    "dismiss": "關閉",
+    "selected": "已選擇"
   },
   "error": {
     "unmatchedLoopBegin": "迴圈開始沒有對應的迴圈結束",

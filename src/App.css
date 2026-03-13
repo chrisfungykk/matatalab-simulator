@@ -8,6 +8,7 @@
   max-width: 1920px;
   margin: 0 auto;
   padding: 0;
+  background: var(--bg-gradient);
 }
 
 /* ── Toolbar ─────────────────────────────────────────────────────── */
@@ -194,8 +195,10 @@
 
 @supports (padding: env(safe-area-inset-bottom)) {
   .app {
+    padding-top: env(safe-area-inset-top);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .app-toolbar {

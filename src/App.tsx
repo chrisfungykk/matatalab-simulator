@@ -16,7 +16,7 @@ import i18n from './i18n';
 import { simulatorReducer, createInitialState } from './core/simulatorReducer';
 import { createExecutor } from './core/executor';
 import type { ProgramExecutor } from './core/executor';
-import type { SimulatorState, SimulatorAction, ChallengeConfig, SpeedSetting, ControlBoardState } from './core/types';
+import type { SimulatorState, SimulatorAction, ChallengeConfig, SpeedSetting, ControlBoardState, BlockType } from './core/types';
 import { SPEED_DELAYS } from './core/types';
 import { builtInChallenges } from './challenges';
 import GridMap from './components/GridMap/GridMap';
@@ -24,10 +24,11 @@ import ControlBoard from './components/ControlBoard/ControlBoard';
 import BlockInventory from './components/BlockInventory/BlockInventory';
 import Toolbar from './components/Toolbar/Toolbar';
 import ChallengeSelector from './components/ChallengeSelector/ChallengeSelector';
-import ErrorDisplay from './components/ErrorDisplay/ErrorDisplay';
+import FeedbackOverlay from './components/FeedbackOverlay/FeedbackOverlay';
 import { TapToPlaceProvider } from './contexts/TapToPlaceContext';
 import SelectionStatusLabel from './components/SelectionStatusLabel/SelectionStatusLabel';
 import { usePreventGestures } from './hooks/usePreventGestures';
+import { getBlockCategory } from './core/blockCategories';
 import './App.css';
 
 // ── Drag overlay ────────────────────────────────────────────────────
@@ -59,21 +60,13 @@ const BLOCK_CATEGORY_STYLES: Record<string, { background: string; border: string
   fun:      { background: '#ffe0b2', border: '#ffa726', color: '#e65100' },
 };
 
-function getBlockCategory(blockType: string): string {
-  if (['forward', 'backward', 'turn_left', 'turn_right'].includes(blockType)) return 'motion';
-  if (['loop_begin', 'loop_end'].includes(blockType)) return 'loop';
-  if (['function_define', 'function_call'].includes(blockType)) return 'function';
-  if (blockType.startsWith('number_')) return 'number';
-  return 'fun';
-}
-
 interface DragOverlayBlockProps {
   blockType: string;
 }
 
 const DragOverlayBlock: React.FC<DragOverlayBlockProps> = ({ blockType }) => {
   const { t } = useTranslation();
-  const category = getBlockCategory(blockType);
+  const category = getBlockCategory(blockType as BlockType);
   const catStyle = BLOCK_CATEGORY_STYLES[category] ?? BLOCK_CATEGORY_STYLES.motion;
   return (
     <div
@@ -339,6 +332,9 @@ function App() {
     [],
   );
 
+  // ── Feedback overlay dismiss ────────────────────────────────────
+  const handleDismissFeedback = useCallback(() => dispatch({ type: 'RESET' }), []);
+
   return (
     <I18nextProvider i18n={i18n}>
       <SimulatorContext.Provider value={{ state, dispatch }}>
@@ -375,6 +371,8 @@ function App() {
                   }}
                   botPosition={state.botPosition}
                   botDirection={state.botDirection}
+                  startPosition={state.botStartPosition}
+                  speed={state.speed}
                   animationType={state.execution.animationType}
                   errorInfo={state.execution.errorInfo}
                 />
@@ -407,10 +405,13 @@ function App() {
               />
             </aside>
 
-            <ErrorDisplay
-              errorInfo={state.execution.errorInfo}
-              goalReached={state.execution.goalReached}
+            <FeedbackOverlay
               executionStatus={state.execution.status}
+              goalReached={state.execution.goalReached}
+              errorInfo={state.execution.errorInfo}
+              challengeDifficulty={state.currentChallenge?.difficulty}
+              language={state.language}
+              onDismiss={handleDismissFeedback}
             />
 
             <footer className="app-version">

@@ -32,6 +32,7 @@ export const ChallengeSelector: React.FC<ChallengeSelectorProps> = ({
               className={styles.card}
               role="button"
               tabIndex={0}
+              data-testid="challenge-card"
               aria-label={`${challenge.title[language]} — ${t(`difficulty.${challenge.difficulty}`)}`}
               onClick={() => onSelectChallenge(challenge)}
               onKeyDown={(e) => {
@@ -42,7 +43,11 @@ export const ChallengeSelector: React.FC<ChallengeSelectorProps> = ({
               }}
             >
               <h3 className={styles.title}>{challenge.title[language]}</h3>
-              <span className={`${styles.badge} ${BADGE_CLASS[challenge.difficulty]}`}>
+              <span
+                className={`${styles.badge} ${BADGE_CLASS[challenge.difficulty]}`}
+                data-testid="difficulty-badge"
+                data-difficulty={challenge.difficulty}
+              >
                 {t(`difficulty.${challenge.difficulty}`)}
               </span>
             </div>

@@ -1,0 +1,56 @@
+/* Import shared animation keyframes */
+@import '../animations.css';
+
+.botSvg {
+  display: block;
+  transition: transform 300ms ease;
+}
+
+/* Idle bobbing animation (Requirement 3.3) */
+.botIdle {
+  animation: idle-bob 2s ease-in-out infinite;
+}
+
+/* Error red flash + shake animation (Requirement 3.5) */
+.botError {
+  animation: error-shake 0.5s ease-in-out 3;
+}
+
+.botError .botBody {
+  fill: #ff4444;
+  transition: fill 0.15s ease;
+}
+
+/* Music animation — musical notes float up (Requirement 3.6) */
+.botMusic .musicNote {
+  opacity: 1;
+  animation: music-float 1s ease-out forwards;
+}
+
+@keyframes music-float {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+/* Dance animation — rotation wiggle (Requirement 3.6) */
+.botDance {
+  animation: dance-wiggle 0.5s ease-in-out 2;
+}
+
+@keyframes dance-wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}

@@ -1,0 +1,85 @@
+/* Shared animation keyframes for Matatalab UI/UX refresh */
+
+/* Bot idle animation — gentle vertical bobbing (Requirement 3.3) */
+@keyframes idle-bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Bot error animation — horizontal shake with red flash (Requirement 3.5) */
+@keyframes error-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+}
+
+/* Block snap into slot — brief scale bounce (Requirement 5.3) */
+@keyframes snap-bounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Block removal — fade and shrink (Requirement 5.4) */
+@keyframes fade-shrink {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* Drop zone highlight — pulsing glow (Requirement 7.2) */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(76, 175, 80, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
+  }
+}
+
+/* Goal cell flag wave — slight rotation oscillation (Requirement 4.3) */
+@keyframes goal-flag-wave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+/* Collectible star glow — opacity pulse (Requirement 4.4) */
+@keyframes star-glow {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}

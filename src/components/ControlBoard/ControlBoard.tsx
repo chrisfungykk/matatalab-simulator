@@ -1,10 +1,12 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, useSortable, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import type { ControlBoardState, ExecutionState, BlockType, CodingBlock, ProgramLine } from '../../core/types';
+import { getBlockCategory } from '../../core/blockCategories';
 import { useTapToPlace } from '../../contexts/TapToPlaceContext';
+import { BlockIcon } from '../BlockIcon/BlockIcon';
 import styles from './ControlBoard.module.css';
 
 // ── Shared helpers ──────────────────────────────────────────────────
@@ -29,21 +31,49 @@ const BLOCK_I18N_KEY: Record<BlockType, string> = {
   fun_dance: 'block.funDance',
 };
 
-function getBlockCategory(blockType: BlockType): string {
-  if (blockType === 'forward' || blockType === 'backward' || blockType === 'turn_left' || blockType === 'turn_right') {
-    return 'motion';
-  }
-  if (blockType === 'loop_begin' || blockType === 'loop_end') {
-    return 'loop';
-  }
-  if (blockType === 'function_define' || blockType === 'function_call') {
-    return 'function';
-  }
-  if (blockType.startsWith('number_')) {
-    return 'number';
-  }
-  return 'fun';
-}
+/** Maximum number of visible empty slots per line */
+const MAX_EMPTY_SLOTS = 6;
+
+// ── Flow indicator arrow between blocks ─────────────────────────────
+
+const FlowIndicator: React.FC = () => (
+  <span className={styles.flowIndicator} data-testid="flow-indicator" aria-hidden="true">
+    <svg width="12" height="12" viewBox="0 0 12 12">
+      <path d="M2 6h6M6 3l3 3-3 3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  </span>
+);
+
+// ── Hand-drag icon for empty placeholder ────────────────────────────
+
+const HandDragIcon: React.FC = () => (
+  <span className={styles.handDragIcon} aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 11V6a2 2 0 0 0-4 0" />
+      <path d="M14 10V4a2 2 0 0 0-4 0v6" />
+      <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+      <path d="M18 8a2 2 0 0 1 4 0v7a8 8 0 0 1-8 8h-2c-2.5 0-4.5-1-6.2-2.8L3 17" />
+    </svg>
+  </span>
+);
+
+// ── Line header icons ───────────────────────────────────────────────
+
+const MainLineIcon: React.FC = () => (
+  <span className={styles.lineHeaderIcon} aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M2 3h12v2H2V3zm0 4h8v2H2V7zm0 4h10v2H2v-2z" />
+    </svg>
+  </span>
+);
+
+const FunctionLineIcon: React.FC = () => (
+  <span className={styles.lineHeaderIcon} aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M5.5 2C4.1 2 3 3.1 3 4.5V6H2v2h1v3.5C3 12.9 4.1 14 5.5 14H7v-2H5.5c-.3 0-.5-.2-.5-.5V8h3V6H5V4.5c0-.3.2-.5.5-.5H7V2H5.5zM10 6v2h1.5c.3 0 .5.2.5.5V12h-3v2h3c1.4 0 2.5-1.1 2.5-2.5V8h1V6h-1V4.5C14.5 3.1 13.4 2 12 2h-1.5v2H12c.3 0 .5.2.5.5V6H10z" />
+    </svg>
+  </span>
+);
 
 // ── Drop zone between blocks ────────────────────────────────────────
 
@@ -109,11 +139,11 @@ interface SortableBlockProps {
   blockIndex: number;
   isExecuting: boolean;
   isError: boolean;
+  isNew: boolean;
   selectedBlock: BlockType | null;
   onRemoveBlock?: (blockId: string) => void;
   onTapPlace?: (blockType: BlockType, line: number, position: number) => void;
 }
-
 
 const SortableBlock: React.FC<SortableBlockProps> = ({
   block,
@@ -121,6 +151,7 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
   blockIndex,
   isExecuting,
   isError,
+  isNew,
   selectedBlock,
   onRemoveBlock,
   onTapPlace,
@@ -152,19 +183,16 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
   }
 
   const handleClick = useCallback(() => {
-    // Prevent click from firing after a drag operation
     if (wasDraggingRef.current) {
       wasDraggingRef.current = false;
       return;
     }
 
     if (selectedBlock === null) {
-      // No block selected → remove this block
       if (onRemoveBlock) {
         onRemoveBlock(block.id);
       }
     } else {
-      // Block selected → insert before this block's position
       if (onTapPlace) {
         onTapPlace(selectedBlock, lineIndex, blockIndex);
       }
@@ -207,6 +235,7 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
     isDragging ? styles.dragging : '',
     isExecuting ? styles.executing : '',
     isError ? styles.errorBlock : '',
+    isNew ? styles.snapBounce : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -229,7 +258,8 @@ const SortableBlock: React.FC<SortableBlockProps> = ({
       data-line={lineIndex}
       data-position={blockIndex}
     >
-      {t(BLOCK_I18N_KEY[block.type])}
+      <BlockIcon blockType={block.type} size={20} />
+      <span className={styles.boardBlockLabel}>{t(BLOCK_I18N_KEY[block.type])}</span>
     </div>
   );
 };
@@ -240,16 +270,16 @@ interface ProgramLineRowProps {
   line: ProgramLine;
   execution: ExecutionState;
   selectedBlock: BlockType | null;
+  newBlockIds: Set<string>;
   onTapPlace?: (blockType: BlockType, line: number, position: number) => void;
   onRemoveBlock?: (blockId: string) => void;
 }
 
-const ProgramLineRow: React.FC<ProgramLineRowProps> = ({ line, execution, selectedBlock, onTapPlace, onRemoveBlock }) => {
+const ProgramLineRow: React.FC<ProgramLineRowProps> = ({ line, execution, selectedBlock, newBlockIds, onTapPlace, onRemoveBlock }) => {
   const { t } = useTranslation();
   const { lineIndex, blocks } = line;
   const isMain = lineIndex === 0;
 
-  // Set up the line itself as a droppable target for empty lines
   const { setNodeRef: setLineRef, isOver: isLineOver } = useDroppable({
     id: `line-${lineIndex}`,
     data: { type: 'program-line', lineIndex },
@@ -282,10 +312,11 @@ const ProgramLineRow: React.FC<ProgramLineRowProps> = ({ line, execution, select
     ? t('ui.mainProgram', 'Main Program')
     : t('ui.functionDefinition', 'Function Definition');
 
-  // Collect block IDs for SortableContext
   const blockIds = blocks.map((b) => b.id);
-
   const isActive = selectedBlock !== null;
+
+  // Calculate empty slots to show
+  const emptySlotCount = Math.max(0, MAX_EMPTY_SLOTS - blocks.length);
 
   return (
     <div
@@ -293,25 +324,35 @@ const ProgramLineRow: React.FC<ProgramLineRowProps> = ({ line, execution, select
       className={lineClassName}
       role="list"
       aria-label={lineLabel}
-      data-testid={`program-line-${lineIndex}`}
+      data-testid="program-line"
       style={isLineOver ? { borderColor: '#2196f3', borderStyle: 'solid' } : undefined}
     >
-      <span className={styles.lineLabel}>{lineLabel}</span>
+      <div className={styles.lineHeader} data-testid="line-header">
+        {isMain ? <MainLineIcon /> : <FunctionLineIcon />}
+        <span className={styles.lineLabel}>{lineLabel}</span>
+      </div>
 
       <SortableContext items={blockIds} strategy={horizontalListSortingStrategy}>
         {blocks.length === 0 ? (
           <>
             <DropZone lineIndex={lineIndex} position={0} selectedBlock={selectedBlock} onTapPlace={onTapPlace} />
-            <span
-              className={styles.emptyHint}
+            <div
+              className={styles.emptyPlaceholder}
               onClick={handleEmptyLineClick}
               onKeyDown={isActive ? handleEmptyLineKeyDown : undefined}
               tabIndex={isActive ? 0 : undefined}
               role={isActive ? 'button' : undefined}
               style={isActive ? { cursor: 'pointer' } : undefined}
             >
-              {t('ui.dropBlocksHere', 'Drop blocks here')}
-            </span>
+              <HandDragIcon />
+              <span className={styles.emptyHintText}>
+                {t('ui.dropBlocksHere', 'Drop blocks here')}
+              </span>
+            </div>
+            {/* Render empty slots for visual guidance */}
+            {Array.from({ length: emptySlotCount }, (_, i) => (
+              <div key={`empty-${lineIndex}-${i}`} className={styles.emptySlot} data-testid="empty-slot" aria-hidden="true" />
+            ))}
           </>
         ) : (
           blocks.map((block, idx) => {
@@ -334,16 +375,25 @@ const ProgramLineRow: React.FC<ProgramLineRowProps> = ({ line, execution, select
                   blockIndex={idx}
                   isExecuting={isExecuting}
                   isError={isError}
+                  isNew={newBlockIds.has(block.id)}
                   selectedBlock={selectedBlock}
                   onRemoveBlock={onRemoveBlock}
                   onTapPlace={onTapPlace}
                 />
+                {/* Flow indicator between blocks (not after the last one) */}
+                {idx < blocks.length - 1 && <FlowIndicator />}
               </React.Fragment>
             );
           })
         )}
         {blocks.length > 0 && (
-          <DropZone lineIndex={lineIndex} position={blocks.length} selectedBlock={selectedBlock} onTapPlace={onTapPlace} />
+          <>
+            <DropZone lineIndex={lineIndex} position={blocks.length} selectedBlock={selectedBlock} onTapPlace={onTapPlace} />
+            {/* Render remaining empty slots after placed blocks */}
+            {Array.from({ length: emptySlotCount }, (_, i) => (
+              <div key={`empty-${lineIndex}-${i}`} className={styles.emptySlot} data-testid="empty-slot" aria-hidden="true" />
+            ))}
+          </>
         )}
       </SortableContext>
     </div>
@@ -371,6 +421,33 @@ export const ControlBoard: React.FC<ControlBoardProps> = ({
   const { t } = useTranslation();
   const { selectedBlock, deselectBlock, setAnnouncement } = useTapToPlace();
 
+  // Track newly placed block IDs for snap-bounce animation
+  const [newBlockIds, setNewBlockIds] = useState<Set<string>>(new Set());
+  const prevBlockIdsRef = useRef<Set<string>>(new Set());
+
+  // Detect newly added blocks by comparing current vs previous block IDs
+  useEffect(() => {
+    const currentIds = new Set(controlBoard.lines.flatMap((l) => l.blocks.map((b) => b.id)));
+    const prevIds = prevBlockIdsRef.current;
+
+    const added = new Set<string>();
+    for (const id of currentIds) {
+      if (!prevIds.has(id)) {
+        added.add(id);
+      }
+    }
+
+    if (added.size > 0) {
+      setNewBlockIds(added);
+      // Clear the animation class after the animation completes
+      const timer = setTimeout(() => setNewBlockIds(new Set()), 200);
+      prevBlockIdsRef.current = currentIds;
+      return () => clearTimeout(timer);
+    }
+
+    prevBlockIdsRef.current = currentIds;
+  }, [controlBoard.lines]);
+
   // Ensure at least 2 lines exist (main + function definition)
   const lines: ProgramLine[] = controlBoard.lines.length >= 2
     ? controlBoard.lines
@@ -387,7 +464,6 @@ export const ControlBoard: React.FC<ControlBoardProps> = ({
       onPlaceBlock(blockType, line, position);
       setAnnouncement(`Placed ${blockType.replace(/_/g, ' ')} at line ${line}, position ${position}`);
 
-      // After placement, check remaining inventory count
       const remainingCount = currentCount - 1;
       if (remainingCount <= 0) {
         deselectBlock();
@@ -398,7 +474,6 @@ export const ControlBoard: React.FC<ControlBoardProps> = ({
 
   const handleTapRemove = useCallback(
     (blockId: string) => {
-      // Find the block type for the announcement
       const block = controlBoard.lines
         .flatMap((l) => l.blocks)
         .find((b) => b.id === blockId);
@@ -423,6 +498,7 @@ export const ControlBoard: React.FC<ControlBoardProps> = ({
           line={line}
           execution={execution}
           selectedBlock={selectedBlock}
+          newBlockIds={newBlockIds}
           onTapPlace={handleTapPlace}
           onRemoveBlock={handleTapRemove}
         />

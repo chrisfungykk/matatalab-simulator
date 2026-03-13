@@ -1,8 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import type { BlockType } from '../../core/types';
+import { getBlockCategory, type BlockCategory } from '../../core/blockCategories';
 import { useTapToPlace } from '../../contexts/TapToPlaceContext';
+import { BlockIcon } from '../BlockIcon/BlockIcon';
 import styles from './BlockInventory.module.css';
 
 /** Maps each BlockType to its i18n key under the "block" namespace. */
@@ -45,22 +47,8 @@ const BLOCK_TYPE_ORDER: BlockType[] = [
   'fun_dance',
 ];
 
-/** Colour category for visual grouping of block types. */
-function getBlockCategory(blockType: BlockType): string {
-  if (blockType === 'forward' || blockType === 'backward' || blockType === 'turn_left' || blockType === 'turn_right') {
-    return 'motion';
-  }
-  if (blockType === 'loop_begin' || blockType === 'loop_end') {
-    return 'loop';
-  }
-  if (blockType === 'function_define' || blockType === 'function_call') {
-    return 'function';
-  }
-  if (blockType.startsWith('number_')) {
-    return 'number';
-  }
-  return 'fun';
-}
+/** Category display order */
+const CATEGORY_ORDER: BlockCategory[] = ['motion', 'loop', 'function', 'number', 'fun'];
 
 // ── Individual draggable block item ─────────────────────────────────
 
@@ -86,7 +74,7 @@ const DraggableBlock: React.FC<DraggableBlockProps> = ({ blockType, count, isSel
 
   const className = [
     styles.block,
-    styles[category],
+    styles[`category-${category}`],
     disabled ? styles.disabled : '',
     isDragging ? styles.dragging : '',
     isSelected ? styles.selected : '',
@@ -120,6 +108,7 @@ const DraggableBlock: React.FC<DraggableBlockProps> = ({ blockType, count, isSel
     <div
       ref={setNodeRef}
       className={className}
+      data-testid="block-item"
       {...attributes}
       {...listeners}
       onClick={handleClick}
@@ -130,8 +119,9 @@ const DraggableBlock: React.FC<DraggableBlockProps> = ({ blockType, count, isSel
       aria-label={`${t(BLOCK_I18N_KEY[blockType])} (${count})`}
       tabIndex={disabled ? -1 : 0}
     >
-      <span className={styles.label}>{t(BLOCK_I18N_KEY[blockType])}</span>
-      <span className={styles.badge} aria-label={`${count}`}>{count}</span>
+      <BlockIcon blockType={blockType} size={28} className={styles.icon} />
+      <span className={styles.label} data-testid="block-label">{t(BLOCK_I18N_KEY[blockType])}</span>
+      <span className={styles.badge} data-testid="count-badge" aria-label={`${count}`}>{count}</span>
     </div>
   );
 };
@@ -146,19 +136,52 @@ export const BlockInventory: React.FC<BlockInventoryProps> = ({ blockInventory }
   const { t } = useTranslation();
   const { selectedBlock, selectBlock, deselectBlock } = useTapToPlace();
 
+  /** Group blocks by category, preserving order within each group */
+  const groupedBlocks = useMemo(() => {
+    const groups: Record<BlockCategory, BlockType[]> = {
+      motion: [],
+      loop: [],
+      function: [],
+      number: [],
+      fun: [],
+    };
+    for (const blockType of BLOCK_TYPE_ORDER) {
+      const cat = getBlockCategory(blockType);
+      groups[cat].push(blockType);
+    }
+    return groups;
+  }, []);
+
   return (
     <section className={styles.inventory} aria-label={t('ui.blockInventory', 'Block Inventory')}>
       <h2 className={styles.heading}>{t('ui.blockInventory', 'Block Inventory')}</h2>
-      <div className={styles.grid}>
-        {BLOCK_TYPE_ORDER.map((blockType) => (
-          <DraggableBlock
-            key={blockType}
-            blockType={blockType}
-            count={blockInventory[blockType]}
-            isSelected={blockType === selectedBlock}
-            onSelect={selectBlock}
-            onDeselect={deselectBlock}
-          />
+      <div className={styles.categories}>
+        {CATEGORY_ORDER.map((category) => (
+          <div
+            key={category}
+            className={`${styles.categoryGroup} ${styles[`categoryGroup-${category}`]}`}
+            data-testid="category-group"
+            data-category={category}
+          >
+            <h3
+              className={`${styles.categoryHeader} ${styles[`categoryHeader-${category}`]}`}
+              data-testid="category-header"
+            >
+              {t(`category.${category}`, category)}
+            </h3>
+            <div className={styles.grid}>
+              {groupedBlocks[category].map((blockType) => (
+                <DraggableBlock
+                  key={blockType}
+                  blockType={blockType}
+                  count={blockInventory[blockType]}
+                  isSelected={blockType === selectedBlock}
+                  onSelect={selectBlock}
+                  onDeselect={deselectBlock}
+                />
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </section>

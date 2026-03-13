@@ -27,17 +27,19 @@
   padding: 10px 14px;
   min-height: var(--min-touch-target);
   border: 2px solid #ddd;
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: #fff;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: border-color 0.15s, box-shadow 0.2s ease, transform 0.2s ease;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
 .card:hover {
   border-color: #1a73e8;
-  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.15);
+  box-shadow: 0 6px 16px rgba(26, 115, 232, 0.2);
+  transform: translateY(-2px);
 }
 
 .card:active {
@@ -69,21 +71,18 @@
 }
 
 .badgeEasy {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #66bb6a;
+  background-color: #4caf50;
+  color: #fff;
 }
 
 .badgeMedium {
-  background-color: #fff3e0;
-  color: #e65100;
-  border: 1px solid #ffa726;
+  background-color: #ff9800;
+  color: #fff;
 }
 
 .badgeHard {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ef5350;
+  background-color: #f44336;
+  color: #fff;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -131,5 +130,16 @@
   .badge {
     padding: 4px 12px;
     font-size: 0.78rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOUCH DEVICES: pointer: coarse — 44×44px minimum touch targets
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (pointer: coarse) {
+  .card {
+    min-width: 44px;
+    min-height: 44px;
   }
 }
