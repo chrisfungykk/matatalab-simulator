@@ -35,7 +35,7 @@
   font-weight: 500;
   transition: opacity 0.2s, box-shadow 0.2s;
   position: relative;
-  touch-action: none; /* required for dnd-kit on touch devices */
+  touch-action: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -140,5 +140,28 @@
     min-width: 18px;
     height: 18px;
     font-size: 0.7rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLET: 768px+ — larger touch targets
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  .grid {
+    gap: 8px;
+  }
+
+  .block {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    gap: 8px;
+    min-height: 48px;
+  }
+
+  .badge {
+    min-width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
   }
 }

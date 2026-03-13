@@ -223,14 +223,14 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   MOBILE: < 768px
-   Compact toolbar, wrap into rows
+   MOBILE: < 768px — compact toolbar
    ═══════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 767px) {
   .toolbar {
     gap: 4px;
     padding: var(--spacing-xs) var(--spacing-sm);
+    justify-content: center;
   }
 
   .separator {
@@ -255,11 +255,80 @@
   .timerGroup {
     gap: 4px;
     flex-wrap: wrap;
+    justify-content: center;
   }
 
   .durationInput {
     width: 50px;
     padding: 6px 4px;
     font-size: 0.8rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLET: 768px – 1023px — balanced layout
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .toolbar {
+    gap: 8px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    justify-content: center;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .speedBtn {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+
+  .langBtn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LANDSCAPE PHONES: compact everything
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .toolbar {
+    gap: 4px;
+    padding: 2px var(--spacing-sm);
+  }
+
+  .separator {
+    height: 20px;
+  }
+
+  .btn {
+    padding: 4px 10px;
+    min-height: 36px;
+    font-size: 0.8rem;
+  }
+
+  .speedBtn {
+    padding: 4px 8px;
+    min-height: 36px;
+    font-size: 0.75rem;
+  }
+
+  .langBtn {
+    padding: 4px 10px;
+    min-height: 36px;
+  }
+
+  .timerGroup {
+    gap: 3px;
+  }
+
+  .durationInput {
+    min-height: 36px;
+    padding: 4px;
   }
 }

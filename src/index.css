@@ -36,21 +36,33 @@
 }
 
 html {
-  /* Prevent iOS text size adjust on orientation change */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Prevent overscroll bounce on iOS */
+  overflow: hidden;
+  height: 100%;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
-  min-height: 100dvh; /* dynamic viewport height for mobile browsers */
-  overscroll-behavior: none; /* prevent pull-to-refresh */
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+}
+
+#root {
+  height: 100%;
 }
 
 /* Prevent double-tap zoom on interactive elements */
 button, [role="button"], input, select {
   touch-action: manipulation;
+}
+
+/* Prevent text selection during drag on touch devices */
+.dragging-active {
+  -webkit-user-select: none;
+  user-select: none;
 }

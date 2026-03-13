@@ -113,3 +113,23 @@
     font-size: 0.85rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLET: 768px+ — larger cards for touch
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  .card {
+    padding: 12px 18px;
+    min-height: 48px;
+  }
+
+  .title {
+    font-size: 0.95rem;
+  }
+
+  .badge {
+    padding: 4px 12px;
+    font-size: 0.78rem;
+  }
+}

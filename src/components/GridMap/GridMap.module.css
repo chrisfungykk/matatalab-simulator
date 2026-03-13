@@ -72,3 +72,29 @@
   0%, 100% { box-shadow: 0 0 0 3px #f44336; }
   50% { box-shadow: 0 0 0 3px transparent; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLET: larger emoji/icons in cells
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  .cell {
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+  }
+
+  .botArrow {
+    border-left-width: clamp(8px, 1.5vw, 14px);
+    border-right-width: clamp(8px, 1.5vw, 14px);
+    border-bottom-width: clamp(14px, 2.5vw, 24px);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LANDSCAPE PHONES: smaller grid
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .cell {
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+  }
+}
