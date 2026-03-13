@@ -157,6 +157,18 @@
   border: 2px dashed #2196f3;
 }
 
+.dropZone.dropZoneVisible {
+  width: 24px;
+  background-color: #e3f2fd;
+  border: 2px dashed #90caf9;
+  cursor: pointer;
+}
+
+.dropZone:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
 /* ── Empty line placeholder ────────────────────────────────────────── */
 
 .emptyHint {
@@ -230,5 +242,28 @@
 
   .dropZone.dropZoneActive {
     width: 32px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOUCH DEVICES: pointer: coarse — 44×44px minimum touch targets
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (pointer: coarse) {
+  .programLine {
+    gap: 8px;
+  }
+
+  .boardBlock {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .dropZone {
+    min-height: 44px;
+  }
+
+  .dropZone.dropZoneVisible {
+    min-width: 44px;
   }
 }

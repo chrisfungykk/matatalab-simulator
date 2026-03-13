@@ -92,6 +92,13 @@
   filter: grayscale(80%);
 }
 
+.selected {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px #1a73e8;
+  outline: 2px solid #1a73e8;
+  outline-offset: 1px;
+}
+
 .dragging {
   opacity: 0.5;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -144,10 +151,39 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   TABLET: 768px+ — larger touch targets
+   TABLET PORTRAIT: 768px–1023px — horizontal scrollable row
    ═══════════════════════════════════════════════════════════════════ */
 
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 1023px) {
+  .grid {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding-bottom: var(--spacing-xs, 4px);
+  }
+
+  .block {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    gap: 8px;
+    min-height: 48px;
+  }
+
+  .badge {
+    min-width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLET LANDSCAPE / DESKTOP: 1024px+ — larger touch targets, wrapping grid
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 1024px) {
   .grid {
     gap: 8px;
   }
@@ -163,5 +199,20 @@
     min-width: 24px;
     height: 24px;
     font-size: 0.8rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOUCH DEVICES: pointer: coarse — 44×44px minimum touch targets
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (pointer: coarse) {
+  .grid {
+    gap: 8px;
+  }
+
+  .block {
+    min-width: 44px;
+    min-height: 44px;
   }
 }

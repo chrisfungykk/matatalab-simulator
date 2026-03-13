@@ -25,6 +25,9 @@ import BlockInventory from './components/BlockInventory/BlockInventory';
 import Toolbar from './components/Toolbar/Toolbar';
 import ChallengeSelector from './components/ChallengeSelector/ChallengeSelector';
 import ErrorDisplay from './components/ErrorDisplay/ErrorDisplay';
+import { TapToPlaceProvider } from './contexts/TapToPlaceContext';
+import SelectionStatusLabel from './components/SelectionStatusLabel/SelectionStatusLabel';
+import { usePreventGestures } from './hooks/usePreventGestures';
 import './App.css';
 
 // ── Drag overlay ────────────────────────────────────────────────────
@@ -118,6 +121,12 @@ function App() {
 
   // ── Active drag tracking ────────────────────────────────────────
   const [activeDragData, setActiveDragData] = useState<{ blockType?: string } | null>(null);
+
+  // ── Gesture prevention refs ─────────────────────────────────────
+  const rightPanelRef = useRef<HTMLDivElement>(null);
+  const blockInventoryRef = useRef<HTMLDivElement>(null);
+  usePreventGestures(rightPanelRef);
+  usePreventGestures(blockInventoryRef);
 
   // ── Sensors ─────────────────────────────────────────────────────
   const sensors = useSensors(
@@ -334,6 +343,7 @@ function App() {
     <I18nextProvider i18n={i18n}>
       <SimulatorContext.Provider value={{ state, dispatch }}>
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <TapToPlaceProvider>
           <div className="app">
             <header className="app-toolbar">
               <Toolbar
@@ -370,19 +380,21 @@ function App() {
                 />
               </section>
 
-              <section className="app-right-panel">
+              <section className="app-right-panel" ref={rightPanelRef}>
+                <div className="app-block-inventory" ref={blockInventoryRef}>
+                  <BlockInventory blockInventory={state.blockInventory} />
+                </div>
+
+                <SelectionStatusLabel />
                 <div className="app-control-board">
                   <ControlBoard
                     controlBoard={state.controlBoard}
                     execution={state.execution}
+                    blockInventory={state.blockInventory}
                     onPlaceBlock={handlePlaceBlock}
                     onRemoveBlock={handleRemoveBlock}
                     onReorderBlock={handleReorderBlock}
                   />
-                </div>
-
-                <div className="app-block-inventory">
-                  <BlockInventory blockInventory={state.blockInventory} />
                 </div>
               </section>
             </main>
@@ -400,7 +412,12 @@ function App() {
               goalReached={state.execution.goalReached}
               executionStatus={state.execution.status}
             />
+
+            <footer className="app-version">
+              v{__APP_VERSION__} · {new Date(__BUILD_TIME__).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+            </footer>
           </div>
+          </TapToPlaceProvider>
 
           <DragOverlay dropAnimation={null}>
             {activeDragData?.blockType ? (

@@ -41,6 +41,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.btn:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
 .btn:hover:not(:disabled) {
   background-color: #e8e8e8;
 }
@@ -110,6 +115,11 @@
   border-radius: 0 6px 6px 0;
 }
 
+.speedBtn:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
 .speedBtn:hover:not(.speedActive) {
   background-color: #e8e8e8;
 }
@@ -134,6 +144,11 @@
   transition: background-color 0.15s;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+.langBtn:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
 }
 
 .langBtn:hover {
@@ -330,5 +345,38 @@
   .durationInput {
     min-height: 36px;
     padding: 4px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TOUCH DEVICES: pointer: coarse — 44×44px minimum touch targets
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (pointer: coarse) {
+  .toolbar {
+    gap: 8px;
+  }
+
+  .group {
+    gap: 8px;
+  }
+
+  .btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .speedBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .langBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .durationInput {
+    min-height: 44px;
   }
 }

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import type { BlockType } from '../../core/types';
+import { useTapToPlace } from '../../contexts/TapToPlaceContext';
 import styles from './BlockInventory.module.css';
 
 /** Maps each BlockType to its i18n key under the "block" namespace. */
@@ -66,9 +67,12 @@ function getBlockCategory(blockType: BlockType): string {
 interface DraggableBlockProps {
   blockType: BlockType;
   count: number;
+  isSelected: boolean;
+  onSelect: (blockType: BlockType) => void;
+  onDeselect: () => void;
 }
 
-const DraggableBlock: React.FC<DraggableBlockProps> = ({ blockType, count }) => {
+const DraggableBlock: React.FC<DraggableBlockProps> = ({ blockType, count, isSelected, onSelect, onDeselect }) => {
   const { t } = useTranslation();
   const disabled = count === 0;
 
@@ -85,9 +89,32 @@ const DraggableBlock: React.FC<DraggableBlockProps> = ({ blockType, count }) => 
     styles[category],
     disabled ? styles.disabled : '',
     isDragging ? styles.dragging : '',
+    isSelected ? styles.selected : '',
   ]
     .filter(Boolean)
     .join(' ');
+
+  const handleClick = useCallback(
+    () => {
+      if (disabled) return;
+      if (isSelected) {
+        onDeselect();
+      } else {
+        onSelect(blockType);
+      }
+    },
+    [disabled, isSelected, blockType, onSelect, onDeselect],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleClick();
+      }
+    },
+    [handleClick],
+  );
 
   return (
     <div
@@ -95,8 +122,11 @@ const DraggableBlock: React.FC<DraggableBlockProps> = ({ blockType, count }) => 
       className={className}
       {...attributes}
       {...listeners}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
       role="button"
       aria-disabled={disabled}
+      aria-pressed={isSelected}
       aria-label={`${t(BLOCK_I18N_KEY[blockType])} (${count})`}
       tabIndex={disabled ? -1 : 0}
     >
@@ -114,6 +144,7 @@ export interface BlockInventoryProps {
 
 export const BlockInventory: React.FC<BlockInventoryProps> = ({ blockInventory }) => {
   const { t } = useTranslation();
+  const { selectedBlock, selectBlock, deselectBlock } = useTapToPlace();
 
   return (
     <section className={styles.inventory} aria-label={t('ui.blockInventory', 'Block Inventory')}>
@@ -124,6 +155,9 @@ export const BlockInventory: React.FC<BlockInventoryProps> = ({ blockInventory }
             key={blockType}
             blockType={blockType}
             count={blockInventory[blockType]}
+            isSelected={blockType === selectedBlock}
+            onSelect={selectBlock}
+            onDeselect={deselectBlock}
           />
         ))}
       </div>
