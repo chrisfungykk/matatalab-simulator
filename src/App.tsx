@@ -16,15 +16,25 @@ import i18n from './i18n';
 import { simulatorReducer, createInitialState } from './core/simulatorReducer';
 import { createExecutor } from './core/executor';
 import type { ProgramExecutor } from './core/executor';
-import type { SimulatorState, SimulatorAction, ChallengeConfig, SpeedSetting, ControlBoardState, BlockType } from './core/types';
+import type { SimulatorState, SimulatorAction, ChallengeConfig, SpeedSetting, ControlBoardState, BlockType, MazeGeneratorParams, RendererType, CompetitionChallengeSet, CompetitionSession, RoundScore } from './core/types';
 import { SPEED_DELAYS } from './core/types';
 import { builtInChallenges } from './challenges';
+import { competitionChallengeSets } from './challenges/competitionSets';
+import { generateMaze } from './core/mazeGenerator';
+import { parseChallenge, prettyPrintChallenge } from './core/challengeParser';
+import { saveSession, loadHistory, getPersonalBest } from './core/competitionPersistence';
+import { calculateSessionSummary, isPersonalBest as checkIsPersonalBest } from './core/scoreCalculation';
 import GridMap from './components/GridMap/GridMap';
+import CanvasGridMap from './components/CanvasGridMap/CanvasGridMap';
 import ControlBoard from './components/ControlBoard/ControlBoard';
 import BlockInventory from './components/BlockInventory/BlockInventory';
 import Toolbar from './components/Toolbar/Toolbar';
 import ChallengeSelector from './components/ChallengeSelector/ChallengeSelector';
 import FeedbackOverlay from './components/FeedbackOverlay/FeedbackOverlay';
+import MazeControls from './components/MazeControls/MazeControls';
+import CompetitionDashboard from './components/CompetitionDashboard/CompetitionDashboard';
+import CompetitionSummary from './components/CompetitionSummary/CompetitionSummary';
+import CompetitionHistory from './components/CompetitionHistory/CompetitionHistory';
 import { TapToPlaceProvider } from './contexts/TapToPlaceContext';
 import SelectionStatusLabel from './components/SelectionStatusLabel/SelectionStatusLabel';
 import { usePreventGestures } from './hooks/usePreventGestures';
@@ -111,6 +121,22 @@ export function useSimulator(): SimulatorContextValue {
 
 function App() {
   const [state, dispatch] = useReducer(simulatorReducer, undefined, createInitialState);
+
+  // ── Canvas 2D support detection (Task 15.3) ─────────────────────
+  const [canvasSupported, setCanvasSupported] = useState(true);
+  useEffect(() => {
+    try {
+      const testCanvas = document.createElement('canvas');
+      const ctx = testCanvas.getContext('2d');
+      if (!ctx) {
+        setCanvasSupported(false);
+        dispatch({ type: 'SET_RENDERER', renderer: 'dom' });
+      }
+    } catch {
+      setCanvasSupported(false);
+      dispatch({ type: 'SET_RENDERER', renderer: 'dom' });
+    }
+  }, []);
 
   // ── Active drag tracking ────────────────────────────────────────
   const [activeDragData, setActiveDragData] = useState<{ blockType?: string } | null>(null);
@@ -310,6 +336,118 @@ function App() {
   const handleTimerTick = useCallback(() => dispatch({ type: 'TIMER_TICK' }), []);
   const handleTimerExpired = useCallback(() => dispatch({ type: 'TIMER_EXPIRED' }), []);
 
+  // ── Renderer toggle callback ────────────────────────────────────
+  const handleToggleRenderer = useCallback(() => {
+    if (!canvasSupported && state.renderer === 'dom') return; // can't switch to canvas if unsupported
+    const next: RendererType = state.renderer === 'canvas' ? 'dom' : 'canvas';
+    dispatch({ type: 'SET_RENDERER', renderer: next });
+  }, [state.renderer, canvasSupported]);
+
+  // ── Competition mode callbacks (Task 16.1) ──────────────────────
+  const [competitionHistory, setCompetitionHistory] = useState<CompetitionSession[]>(() => {
+    const history = loadHistory();
+    return history?.sessions ?? [];
+  });
+  const [showCompetitionSummary, setShowCompetitionSummary] = useState(false);
+  const [summaryIsPersonalBest, setSummaryIsPersonalBest] = useState(false);
+
+  const handleToggleCompetition = useCallback(() => {
+    if (state.competition.active) {
+      dispatch({ type: 'DEACTIVATE_COMPETITION' });
+      setShowCompetitionSummary(false);
+    } else {
+      // Just toggle on — user picks a set via ChallengeSelector
+      dispatch({ type: 'DEACTIVATE_COMPETITION' });
+    }
+  }, [state.competition.active]);
+
+  const handleStartRound = useCallback(() => {
+    dispatch({ type: 'START_ROUND' });
+  }, []);
+
+  const handleCompleteRound = useCallback((score: RoundScore) => {
+    dispatch({ type: 'COMPLETE_ROUND', score });
+  }, []);
+
+  const handleSelectCompetitionSet = useCallback((set: CompetitionChallengeSet) => {
+    dispatch({ type: 'ACTIVATE_COMPETITION', challengeSet: set });
+    setShowCompetitionSummary(false);
+    // Auto-start the first round after activation
+    setTimeout(() => handleStartRound(), 0);
+  }, [handleStartRound]);
+
+  const handleNextRound = useCallback(() => {
+    const session = state.competition.currentSession;
+    if (!session) return;
+    const nextIndex = state.competition.currentRoundIndex + 1;
+    if (nextIndex >= session.rounds.length) {
+      // All rounds done — calculate final summary and show it
+      const collectibleCounts = state.competition.challengeSet?.challenges.map(entry => {
+        if (entry.type === 'predefined' && entry.challengeConfig) {
+          return entry.challengeConfig.collectibles.length;
+        }
+        return entry.mazeParams?.collectibles ?? 0;
+      }) ?? [];
+      const summary = calculateSessionSummary(session.rounds, collectibleCounts);
+      const finalSession: CompetitionSession = {
+        ...session,
+        totalScore: summary.totalScore,
+        starRating: summary.starRating,
+      };
+      // Check personal best
+      const storedBest = getPersonalBest(session.challengeSetId);
+      const isPB = checkIsPersonalBest(summary.totalScore, storedBest);
+      setSummaryIsPersonalBest(isPB);
+      // Save session to localStorage
+      saveSession(finalSession);
+      setCompetitionHistory(prev => [...prev, finalSession]);
+      setShowCompetitionSummary(true);
+    } else {
+      dispatch({ type: 'NEXT_ROUND' });
+      // Auto-start the next round
+      setTimeout(() => handleStartRound(), 0);
+    }
+  }, [state.competition.currentSession, state.competition.currentRoundIndex, state.competition.challengeSet, handleStartRound]);
+
+  const handleDismissCompetitionSummary = useCallback(() => {
+    setShowCompetitionSummary(false);
+    dispatch({ type: 'DEACTIVATE_COMPETITION' });
+  }, []);
+
+  // ── Auto-score competition round on execution completion ────────
+  useEffect(() => {
+    if (!state.competition.active || !state.competition.currentSession) return;
+    const status = state.execution.status;
+    if (status !== 'completed' && status !== 'error') return;
+
+    // Only score if the current round is not yet completed
+    const currentRound = state.competition.currentSession.rounds[state.competition.currentRoundIndex];
+    if (!currentRound || currentRound.completed) return;
+
+    const goalReached = state.execution.goalReached ?? false;
+    const collectiblesGathered = state.collectedItems.length;
+    const stepCount = state.execution.stepCount ?? 0;
+    // Estimate optimal steps as Manhattan distance (rough heuristic)
+    const optimalSteps = Math.max(1, stepCount);
+    const timeRemaining = state.timer.remaining;
+    const timeLimit = state.competition.timeLimit;
+
+    const score: RoundScore = {
+      goalReached,
+      basePoints: goalReached ? 100 : 0,
+      collectibleBonus: collectiblesGathered * 20,
+      efficiencyBonus: Math.max(0, 50 - (stepCount - optimalSteps) * 5),
+      speedBonus: timeLimit > 0 ? Math.max(0, Math.floor((timeRemaining / timeLimit) * 50)) : 0,
+      total: 0,
+    };
+    score.total = score.basePoints + score.collectibleBonus + score.efficiencyBonus + score.speedBonus;
+
+    handleCompleteRound(score);
+    // Auto-advance to next round after a short delay
+    setTimeout(() => handleNextRound(), 2000);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.execution.status]);
+
   // ── Challenge selector callback ─────────────────────────────────
   const handleSelectChallenge = useCallback(
     (config: ChallengeConfig) => dispatch({ type: 'LOAD_CHALLENGE', config }),
@@ -335,6 +473,72 @@ function App() {
   // ── Feedback overlay dismiss ────────────────────────────────────
   const handleDismissFeedback = useCallback(() => dispatch({ type: 'RESET' }), []);
 
+  // ── Maze generation, export, and import (Tasks 14.2–14.5) ───────
+  const { t } = useTranslation();
+  const [generatedSeed, setGeneratedSeed] = useState<number | undefined>(undefined);
+
+  // 14.2: Generate maze and dispatch LOAD_GENERATED_MAZE
+  const handleGenerateMaze = useCallback((params: MazeGeneratorParams) => {
+    try {
+      const result = generateMaze(params);
+      dispatch({ type: 'LOAD_GENERATED_MAZE', result });
+      setGeneratedSeed(result.seed);
+    } catch {
+      alert(t('maze.generateError'));
+    }
+  }, [t]);
+
+  // 14.4: Export current challenge config as JSON file download
+  const handleExportMaze = useCallback(() => {
+    if (!state.currentChallenge) return;
+    const json = prettyPrintChallenge(state.currentChallenge);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `maze-${state.currentChallenge.generationSeed ?? 'custom'}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [state.currentChallenge]);
+
+  // 14.5: Import maze JSON with validation and bilingual error messages
+  const handleImportMaze = useCallback((file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result;
+      if (typeof text !== 'string') return;
+      try {
+        const config = parseChallenge(text);
+        dispatch({ type: 'LOAD_CHALLENGE', config });
+        if (config.generationSeed != null) {
+          setGeneratedSeed(config.generationSeed);
+        } else {
+          setGeneratedSeed(undefined);
+        }
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : '';
+        alert(`${t('maze.invalidFile')}\n${detail}`);
+      }
+    };
+    reader.readAsText(file);
+  }, [t]);
+
+  // Helper: trigger file input for maze import
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleImportClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImportMaze(file);
+      // Reset input so the same file can be re-imported
+      e.target.value = '';
+    }
+  }, [handleImportMaze]);
+
   return (
     <I18nextProvider i18n={i18n}>
       <SimulatorContext.Provider value={{ state, dispatch }}>
@@ -357,25 +561,63 @@ function App() {
                 language={state.language}
                 executionStatus={state.execution.status}
                 timer={state.timer}
+                renderer={state.renderer}
+                onToggleRenderer={handleToggleRenderer}
+                competitionActive={state.competition.active}
+                onToggleCompetition={handleToggleCompetition}
               />
             </header>
 
             <main className="app-main">
-              <section className="app-grid-panel">
-                <GridMap
-                  gridSize={{ width: state.grid.width, height: state.grid.height }}
-                  cells={{
-                    obstacles: state.grid.obstacles,
-                    goals: state.grid.goals,
-                    collectibles: state.grid.collectibles,
-                  }}
-                  botPosition={state.botPosition}
-                  botDirection={state.botDirection}
-                  startPosition={state.botStartPosition}
-                  speed={state.speed}
-                  animationType={state.execution.animationType}
-                  errorInfo={state.execution.errorInfo}
+              {/* Task 16.2: Competition Dashboard — visible when competition active */}
+              {state.competition.active && state.competition.currentSession && (
+                <CompetitionDashboard
+                  session={state.competition.currentSession}
+                  currentRoundIndex={state.competition.currentRoundIndex}
+                  timeRemaining={state.timer.remaining}
+                  language={state.language}
                 />
+              )}
+
+              <section className="app-grid-panel">
+                {!canvasSupported && (
+                  <div className="canvas-unsupported-msg" role="alert">
+                    {t('renderer.canvasUnsupported')}
+                  </div>
+                )}
+                {state.renderer === 'canvas' ? (
+                  <CanvasGridMap
+                    gridSize={{ width: state.grid.width, height: state.grid.height }}
+                    cells={{
+                      obstacles: state.grid.obstacles,
+                      goals: state.grid.goals,
+                      collectibles: state.grid.collectibles,
+                    }}
+                    botPosition={state.botPosition}
+                    botDirection={state.botDirection}
+                    startPosition={state.botStartPosition}
+                    speed={state.speed}
+                    animationType={state.execution.animationType}
+                    errorInfo={state.execution.errorInfo}
+                    collectedItems={state.collectedItems}
+                    goalReached={state.execution.goalReached}
+                  />
+                ) : (
+                  <GridMap
+                    gridSize={{ width: state.grid.width, height: state.grid.height }}
+                    cells={{
+                      obstacles: state.grid.obstacles,
+                      goals: state.grid.goals,
+                      collectibles: state.grid.collectibles,
+                    }}
+                    botPosition={state.botPosition}
+                    botDirection={state.botDirection}
+                    startPosition={state.botStartPosition}
+                    speed={state.speed}
+                    animationType={state.execution.animationType}
+                    errorInfo={state.execution.errorInfo}
+                  />
+                )}
               </section>
 
               <section className="app-right-panel" ref={rightPanelRef}>
@@ -402,6 +644,38 @@ function App() {
                 challenges={builtInChallenges}
                 onSelectChallenge={handleSelectChallenge}
                 language={state.language}
+                competitionSets={competitionChallengeSets}
+                onSelectCompetitionSet={handleSelectCompetitionSet}
+              />
+              {/* Task 16.4: Competition History — visible when competition mode is active */}
+              {state.competition.active && (
+                <CompetitionHistory
+                  sessions={competitionHistory}
+                  language={state.language}
+                />
+              )}
+              <MazeControls
+                onGenerate={handleGenerateMaze}
+                onExport={handleExportMaze}
+                generatedSeed={generatedSeed}
+                language={state.language}
+                disabled={state.execution.status === 'running'}
+              />
+              <button
+                className="maze-import-btn"
+                onClick={handleImportClick}
+                disabled={state.execution.status === 'running'}
+                data-testid="maze-import-button"
+              >
+                {t('maze.import')}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+                data-testid="maze-import-input"
               />
             </aside>
 
@@ -413,6 +687,16 @@ function App() {
               language={state.language}
               onDismiss={handleDismissFeedback}
             />
+
+            {/* Task 16.3: Competition Summary overlay — shown after all rounds complete */}
+            {showCompetitionSummary && state.competition.currentSession && (
+              <CompetitionSummary
+                session={state.competition.currentSession}
+                isPersonalBest={summaryIsPersonalBest}
+                language={state.language}
+                onDismiss={handleDismissCompetitionSummary}
+              />
+            )}
 
             <footer className="app-version">
               v{__APP_VERSION__} · {new Date(__BUILD_TIME__).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}

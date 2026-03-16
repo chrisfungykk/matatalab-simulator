@@ -79,5 +79,82 @@
     "loadError": "Failed to load program: invalid JSON file",
     "fileLabel": "Choose program file",
     "downloadFilename": "matatalab-program.json"
+  },
+  "competition": {
+    "modeToggle": "Mode",
+    "freePractice": "Free Practice",
+    "competitionMode": "Competition Mode",
+    "dashboard": "Competition Dashboard",
+    "round": "Round",
+    "timeRemaining": "Time Remaining",
+    "score": "Score",
+    "progress": "Progress",
+    "summary": "Summary",
+    "totalScore": "Total Score",
+    "starRating": "Star Rating",
+    "perRoundScores": "Per-Round Scores",
+    "personalBest": "Personal Best",
+    "newPersonalBest": "New Personal Best!",
+    "areasForImprovement": "Areas for Improvement",
+    "improvement": {
+      "reachGoal": "Try to reach the goal in every round",
+      "fewerSteps": "Use fewer steps to earn efficiency bonus",
+      "workFaster": "Work faster to earn speed bonus",
+      "collectMore": "Collect more items along the way"
+    },
+    "sessionComplete": "Session Complete",
+    "history": "History",
+    "pastSessions": "Past Sessions",
+    "noHistory": "No competition history yet",
+    "basePoints": "Base Points",
+    "collectibleBonus": "Collectible Bonus",
+    "efficiencyBonus": "Efficiency Bonus",
+    "speedBonus": "Speed Bonus",
+    "goalReached": "Goal Reached",
+    "goalNotReached": "Goal Not Reached",
+    "tier": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
+  "maze": {
+    "generate": "Generate Maze",
+    "difficulty": "Difficulty",
+    "seed": "Seed",
+    "seedInput": "Enter seed value",
+    "gridWidth": "Grid Width",
+    "gridHeight": "Grid Height",
+    "collectibleCount": "Collectibles",
+    "export": "Export Maze",
+    "import": "Import Maze",
+    "generatedMaze": "Generated Maze",
+    "seedDisplay": "Seed: {{seed}}",
+    "invalidFile": "Invalid maze file",
+    "generateError": "Failed to generate maze"
+  },
+  "challengeSet": {
+    "orientation": "Orientation",
+    "navigation": "Navigation",
+    "collection": "Collection",
+    "combined": "Combined",
+    "skillFocus": "Skill Focus",
+    "challengeCount": "{{count}} Challenges",
+    "recommendedTime": "Recommended: {{time}} min per challenge",
+    "randomMaze": "Random Maze",
+    "predefined": "Predefined"
+  },
+  "scoring": {
+    "score": "Score",
+    "stars": "Stars",
+    "personalBest": "Personal Best",
+    "round": "Round",
+    "complete": "Complete"
+  },
+  "renderer": {
+    "dom": "DOM Renderer",
+    "canvas": "Canvas Renderer",
+    "toggle": "Switch Renderer",
+    "canvasUnsupported": "Canvas is not supported in your browser. Using DOM renderer."
   }
 }

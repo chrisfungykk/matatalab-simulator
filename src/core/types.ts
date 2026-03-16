@@ -64,6 +64,91 @@ export const SPEED_DELAYS: Record<SpeedSetting, number> = {
   fast: 300,
 };
 
+// ── Renderer ────────────────────────────────────────────────────────
+
+export type RendererType = 'dom' | 'canvas';
+
+// ── Competition Mode ────────────────────────────────────────────────
+
+export type CompetitionTier = 'beginner' | 'intermediate' | 'advanced';
+
+export interface RoundScore {
+  goalReached: boolean;
+  basePoints: number;
+  collectibleBonus: number;
+  efficiencyBonus: number;
+  speedBonus: number;
+  total: number;
+}
+
+export interface CompetitionRound {
+  roundNumber: number;
+  challengeId: string;
+  isRandom: boolean;
+  score: RoundScore;
+  completed: boolean;
+  timeUsed: number;
+}
+
+export interface CompetitionSession {
+  id: string;
+  date: string;
+  challengeSetId: string;
+  challengeSetName: Record<'zh' | 'en', string>;
+  tier: CompetitionTier;
+  rounds: CompetitionRound[];
+  totalScore: number;
+  starRating: 1 | 2 | 3;
+}
+
+export interface CompetitionState {
+  active: boolean;
+  currentSession: CompetitionSession | null;
+  currentRoundIndex: number;
+  timeLimit: number;
+  challengeSet: CompetitionChallengeSet | null;
+}
+
+export interface CompetitionChallengeSet {
+  id: string;
+  title: Record<'zh' | 'en', string>;
+  description: Record<'zh' | 'en', string>;
+  skillFocus: 'orientation' | 'navigation' | 'collection' | 'combined';
+  tier: CompetitionTier;
+  challenges: CompetitionChallengeEntry[];
+  recommendedTimePerChallenge: number;
+}
+
+export interface CompetitionChallengeEntry {
+  type: 'predefined' | 'random';
+  challengeConfig?: ChallengeConfig;
+  mazeParams?: MazeGeneratorParams;
+}
+
+// ── Maze Generator ──────────────────────────────────────────────────
+
+export interface MazeGeneratorParams {
+  width: number;
+  height: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  collectibles: number;
+  seed?: number;
+}
+
+export interface MazeGeneratorResult {
+  config: ChallengeConfig;
+  seed: number;
+}
+
+// ── Competition History ─────────────────────────────────────────────
+
+export interface StoredCompetitionHistory {
+  version: 1;
+  sessions: CompetitionSession[];
+  personalBests: Record<string, number>;
+}
+
+
 // ── Execution ───────────────────────────────────────────────────────
 
 export interface StackFrame {
@@ -140,6 +225,7 @@ export interface ChallengeConfig {
   collectibles: Position[];
   blockInventory: Partial<Record<BlockType, number>>;
   timeLimit?: number;
+  generationSeed?: number;
 }
 
 // ── Simulator State ─────────────────────────────────────────────────
@@ -163,6 +249,8 @@ export interface SimulatorState {
     running: boolean;
   };
   language: 'zh' | 'en';
+  renderer: RendererType;
+  competition: CompetitionState;
 }
 
 // ── Default Block Inventory (Physical Set Limits) ───────────────────
@@ -203,4 +291,12 @@ export type SimulatorAction =
   | { type: 'TIMER_TICK' }
   | { type: 'TIMER_START'; duration: number }
   | { type: 'TIMER_STOP' }
-  | { type: 'TIMER_EXPIRED' };
+  | { type: 'TIMER_EXPIRED' }
+  | { type: 'SET_RENDERER'; renderer: RendererType }
+  | { type: 'ACTIVATE_COMPETITION'; challengeSet: CompetitionChallengeSet }
+  | { type: 'DEACTIVATE_COMPETITION' }
+  | { type: 'START_ROUND' }
+  | { type: 'COMPLETE_ROUND'; score: RoundScore }
+  | { type: 'NEXT_ROUND' }
+  | { type: 'GENERATE_MAZE'; params: MazeGeneratorParams }
+  | { type: 'LOAD_GENERATED_MAZE'; result: MazeGeneratorResult };

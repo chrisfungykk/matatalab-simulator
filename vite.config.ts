@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/matatalab-simulator/',
   define: {
-    __APP_VERSION__: JSON.stringify('1.2.0'),
+    __APP_VERSION__: JSON.stringify('1.3.0'),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   },
 })

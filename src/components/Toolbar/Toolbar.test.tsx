@@ -390,3 +390,84 @@ describe('Toolbar', () => {
     });
   });
 });
+
+describe('Competition Toggle', () => {
+  beforeEach(() => {
+    i18n.changeLanguage('zh');
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  it('renders competition toggle button when onToggleCompetition is provided', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: false });
+    const btn = screen.getByTestId('competition-toggle');
+    expect(btn).toBeInTheDocument();
+  });
+
+  it('does not render competition toggle when onToggleCompetition is not provided', () => {
+    renderToolbar({ onToggleCompetition: undefined });
+    expect(screen.queryByTestId('competition-toggle')).not.toBeInTheDocument();
+  });
+
+  it('calls onToggleCompetition when clicked', () => {
+    const handler = vi.fn();
+    renderToolbar({ onToggleCompetition: handler, competitionActive: false });
+    fireEvent.click(screen.getByTestId('competition-toggle'));
+    expect(handler).toHaveBeenCalledOnce();
+  });
+
+  it('shows free practice label when competition is inactive', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: false });
+    const btn = screen.getByTestId('competition-toggle');
+    expect(btn.textContent).toContain('自由練習');
+  });
+
+  it('shows competition mode label when competition is active', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: true });
+    const btn = screen.getByTestId('competition-toggle');
+    expect(btn.textContent).toContain('比賽模式');
+  });
+
+  it('has aria-pressed=false when competition is inactive', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: false });
+    const btn = screen.getByTestId('competition-toggle');
+    expect(btn).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('has aria-pressed=true when competition is active', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: true });
+    const btn = screen.getByTestId('competition-toggle');
+    expect(btn).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('applies active style class when competition is active', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: true });
+    const btn = screen.getByTestId('competition-toggle');
+    expect(btn.className).toContain('competitionActive');
+  });
+
+  it('does not apply active style class when competition is inactive', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: false });
+    const btn = screen.getByTestId('competition-toggle');
+    expect(btn.className).not.toContain('competitionActive');
+  });
+
+  it('has aria-label for accessibility', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: false });
+    const btn = screen.getByTestId('competition-toggle');
+    expect(btn).toHaveAttribute('aria-label');
+  });
+
+  it('contains a trophy icon SVG', () => {
+    renderToolbar({ onToggleCompetition: vi.fn(), competitionActive: false });
+    const btn = screen.getByTestId('competition-toggle');
+    const svg = btn.querySelector('svg');
+    expect(svg).toBeInTheDocument();
+  });
+});
+

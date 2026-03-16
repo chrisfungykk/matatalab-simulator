@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  font-size: 16px;
   color: #213547;
   background-color: #ffffff;
   font-synthesis: none;
@@ -33,6 +34,24 @@
   /* Theme */
   --font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
   --bg-gradient: linear-gradient(135deg, #fef9ef 0%, #e8f5e9 50%, #e3f2fd 100%);
+  --bg-gradient-warm: linear-gradient(135deg, #fef6e4 0%, #e8f5e9 40%, #e3f2fd 70%, #fce4ec 100%);
+
+  /* Kid-friendly button sizes */
+  --btn-circle-size: 56px;
+  --btn-run-bg: #4caf50;
+  --btn-run-hover: #43a047;
+  --btn-run-active: #388e3c;
+  --btn-run-text: #fff;
+  --btn-run-shadow: 0 4px 0 #2e7d32, 0 6px 12px rgba(0, 0, 0, 0.15);
+  --btn-reset-bg: #ff9800;
+  --btn-reset-hover: #f57c00;
+  --btn-reset-active: #ef6c00;
+  --btn-reset-text: #fff;
+  --btn-reset-shadow: 0 4px 0 #e65100, 0 6px 12px rgba(0, 0, 0, 0.15);
+
+  /* Animation durations */
+  --anim-bounce-duration: 200ms;
+  --anim-bounce-overshoot: 1.15;
 
   /* Category colors (blocks) */
   --color-motion: #bbdefb;
@@ -63,12 +82,6 @@
   --overlay-bg: rgba(0, 0, 0, 0.5);
   --confetti-duration: 3s;
 
-  /* Buttons */
-  --btn-run-bg: #4caf50;
-  --btn-run-text: #fff;
-  --btn-reset-bg: #ff9800;
-  --btn-reset-text: #fff;
-
   /* Block 3D effect */
   --block-shadow: 0 3px 0 rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.1);
   --block-radius: 12px;
@@ -96,6 +109,7 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   font-family: var(--font-family);
+  font-size: 16px;
 }
 
 #root {

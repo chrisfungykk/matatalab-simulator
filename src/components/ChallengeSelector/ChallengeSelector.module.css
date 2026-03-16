@@ -85,6 +85,42 @@
   color: #fff;
 }
 
+.badgeTier {
+  background-color: #7b1fa2;
+  color: #fff;
+}
+
+.competitionCard {
+  flex-direction: column;
+  align-items: flex-start;
+  border-color: #ce93d8;
+  background: linear-gradient(135deg, #f3e5f5 0%, #fff 100%);
+}
+
+.setInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.setMeta {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.setDescription {
+  margin: 2px 0 4px;
+  font-size: 0.8rem;
+  color: #555;
+  line-height: 1.3;
+}
+
+.diceIcon {
+  font-size: 1rem;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    MOBILE: < 768px — horizontal scrollable cards
    ═══════════════════════════════════════════════════════════════════ */

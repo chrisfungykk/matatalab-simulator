@@ -79,5 +79,82 @@
     "loadError": "載入程式失敗：無效的 JSON 檔案",
     "fileLabel": "選擇程式檔案",
     "downloadFilename": "matatalab-program.json"
+  },
+  "competition": {
+    "modeToggle": "模式",
+    "freePractice": "自由練習",
+    "competitionMode": "比賽模式",
+    "dashboard": "比賽儀表板",
+    "round": "回合",
+    "timeRemaining": "剩餘時間",
+    "score": "得分",
+    "progress": "進度",
+    "summary": "總結",
+    "totalScore": "總分",
+    "starRating": "星級評分",
+    "perRoundScores": "每回合得分",
+    "personalBest": "個人最佳",
+    "newPersonalBest": "新個人最佳紀錄！",
+    "areasForImprovement": "待改進項目",
+    "improvement": {
+      "reachGoal": "嘗試在每個回合都到達目標",
+      "fewerSteps": "用更少的步數來獲得效率獎勵",
+      "workFaster": "加快速度來獲得速度獎勵",
+      "collectMore": "沿途收集更多物品"
+    },
+    "sessionComplete": "練習完成",
+    "history": "歷史紀錄",
+    "pastSessions": "過往練習",
+    "noHistory": "尚無比賽紀錄",
+    "basePoints": "基本分數",
+    "collectibleBonus": "收集獎勵",
+    "efficiencyBonus": "效率獎勵",
+    "speedBonus": "速度獎勵",
+    "goalReached": "到達目標",
+    "goalNotReached": "未到達目標",
+    "tier": {
+      "beginner": "初級",
+      "intermediate": "中級",
+      "advanced": "高級"
+    }
+  },
+  "maze": {
+    "generate": "生成迷宮",
+    "difficulty": "難度",
+    "seed": "種子碼",
+    "seedInput": "輸入種子碼",
+    "gridWidth": "格子寬度",
+    "gridHeight": "格子高度",
+    "collectibleCount": "收集物數量",
+    "export": "匯出迷宮",
+    "import": "匯入迷宮",
+    "generatedMaze": "已生成迷宮",
+    "seedDisplay": "種子碼：{{seed}}",
+    "invalidFile": "無效的迷宮檔案",
+    "generateError": "生成迷宮失敗"
+  },
+  "challengeSet": {
+    "orientation": "方向感",
+    "navigation": "導航",
+    "collection": "收集",
+    "combined": "綜合",
+    "skillFocus": "技能重點",
+    "challengeCount": "{{count}} 個挑戰",
+    "recommendedTime": "建議：每個挑戰 {{time}} 分鐘",
+    "randomMaze": "隨機迷宮",
+    "predefined": "預設關卡"
+  },
+  "scoring": {
+    "score": "得分",
+    "stars": "星級",
+    "personalBest": "個人最佳",
+    "round": "回合",
+    "complete": "完成"
+  },
+  "renderer": {
+    "dom": "DOM 渲染器",
+    "canvas": "Canvas 渲染器",
+    "toggle": "切換渲染器",
+    "canvasUnsupported": "您的瀏覽器不支援 Canvas，已切換至 DOM 渲染器。"
   }
 }

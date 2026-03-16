@@ -92,16 +92,33 @@
   border-radius: var(--block-radius, 12px);
   background-color: rgba(0, 0, 0, 0.03);
   flex-shrink: 0;
+  position: relative;
+}
+
+.emptySlot::after {
+  content: '+';
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.15);
+  pointer-events: none;
 }
 
 .mainLine .emptySlot {
   border-color: #90caf9;
-  background-color: rgba(33, 150, 243, 0.05);
+  background-color: rgba(33, 150, 243, 0.08);
+}
+
+.mainLine .emptySlot::after {
+  color: rgba(33, 150, 243, 0.25);
 }
 
 .functionLine .emptySlot {
   border-color: #a5d6a7;
-  background-color: rgba(76, 175, 80, 0.05);
+  background-color: rgba(76, 175, 80, 0.08);
+}
+
+.functionLine .emptySlot::after {
+  color: rgba(76, 175, 80, 0.25);
 }
 
 /* ── Flow indicator ────────────────────────────────────────────────── */
@@ -161,10 +178,10 @@
   line-height: 1.2;
 }
 
-/* ── Snap-bounce animation on placement ────────────────────────────── */
+/* ── Bouncy scale-up animation on placement ────────────────────────── */
 
 .snapBounce {
-  animation: snap-bounce 150ms ease-out;
+  animation: bouncy-place var(--anim-bounce-duration, 200ms) ease-out;
 }
 
 /* ── Fade-shrink animation on removal ──────────────────────────────── */

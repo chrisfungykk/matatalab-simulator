@@ -60,24 +60,66 @@
 }
 
 .btnRun {
-  background-color: #4caf50;
-  color: #fff;
-  border-color: #43a047;
-  font-weight: 600;
+  width: var(--btn-circle-size, 56px);
+  height: var(--btn-circle-size, 56px);
+  min-width: var(--btn-circle-size, 56px);
+  min-height: var(--btn-circle-size, 56px);
+  border-radius: 50%;
+  padding: 0;
+  background-color: var(--btn-run-bg);
+  color: var(--btn-run-text);
+  border: 3px solid var(--btn-run-hover, #43a047);
+  font-weight: 700;
+  font-size: 0;
+  box-shadow: var(--btn-run-shadow);
+  transition: background-color 0.15s, box-shadow 0.15s, transform 0.1s;
 }
 
 .btnRun:hover:not(:disabled) {
-  background-color: #43a047;
+  background-color: var(--btn-run-hover, #43a047);
+  box-shadow: 0 5px 0 #2e7d32, 0 8px 16px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.btnRun:active:not(:disabled) {
+  background-color: var(--btn-run-active, #388e3c);
+  box-shadow: 0 2px 0 #2e7d32, 0 3px 6px rgba(0, 0, 0, 0.12);
+  transform: translateY(2px);
 }
 
 .btnReset {
-  background-color: #ff9800;
-  color: #fff;
-  border-color: #f57c00;
+  width: var(--btn-circle-size, 56px);
+  height: var(--btn-circle-size, 56px);
+  min-width: var(--btn-circle-size, 56px);
+  min-height: var(--btn-circle-size, 56px);
+  border-radius: 50%;
+  padding: 0;
+  background-color: var(--btn-reset-bg);
+  color: var(--btn-reset-text);
+  border: 3px solid var(--btn-reset-hover, #f57c00);
+  font-weight: 700;
+  font-size: 0;
+  box-shadow: var(--btn-reset-shadow);
+  transition: background-color 0.15s, box-shadow 0.15s, transform 0.1s;
 }
 
 .btnReset:hover:not(:disabled) {
-  background-color: #f57c00;
+  background-color: var(--btn-reset-hover, #f57c00);
+  box-shadow: 0 5px 0 #e65100, 0 8px 16px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.btnReset:active:not(:disabled) {
+  background-color: var(--btn-reset-active, #ef6c00);
+  box-shadow: 0 2px 0 #e65100, 0 3px 6px rgba(0, 0, 0, 0.12);
+  transform: translateY(2px);
+}
+
+/* Scale up the SVG icons inside circular Run/Reset buttons */
+.btnRun .btnIcon,
+.btnReset .btnIcon {
+  width: 24px;
+  height: 24px;
 }
 
 /* ── Speed selector ──────────────────────────────────────────────── */
@@ -225,7 +267,24 @@
   background-color: #d32f2f;
 }
 
+/* ── Competition toggle ───────────────────────────────────────────── */
+
+.competitionActive {
+  background-color: #7b1fa2;
+  color: #fff;
+  border-color: #6a1b9a;
+}
+
+.competitionActive:hover:not(:disabled) {
+  background-color: #6a1b9a;
+}
+
 /* ── Hidden file input ───────────────────────────────────────────── */
+
+.btnIcon {
+  display: block;
+  flex-shrink: 0;
+}
 
 .hiddenInput {
   position: absolute;

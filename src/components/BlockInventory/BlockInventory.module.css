@@ -35,16 +35,49 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
 }
 
-/* Category header colors */
-.categoryHeader-motion { color: var(--color-motion-text); border-bottom: 2px solid var(--color-motion-border); }
-.categoryHeader-loop { color: var(--color-loop-text); border-bottom: 2px solid var(--color-loop-border); }
-.categoryHeader-function { color: var(--color-function-text); border-bottom: 2px solid var(--color-function-border); }
-.categoryHeader-number { color: var(--color-number-text); border-bottom: 2px solid var(--color-number-border); }
-.categoryHeader-fun { color: var(--color-fun-text); border-bottom: 2px solid var(--color-fun-border); }
+/* Category header colors — badge style with background tint */
+.categoryHeader-motion {
+  color: var(--color-motion-text);
+  background-color: var(--color-motion);
+  border: 2px solid var(--color-motion-border);
+}
+.categoryHeader-motion::before { content: '🏃'; font-size: 0.85rem; }
+
+.categoryHeader-loop {
+  color: var(--color-loop-text);
+  background-color: var(--color-loop);
+  border: 2px solid var(--color-loop-border);
+}
+.categoryHeader-loop::before { content: '🔄'; font-size: 0.85rem; }
+
+.categoryHeader-function {
+  color: var(--color-function-text);
+  background-color: var(--color-function);
+  border: 2px solid var(--color-function-border);
+}
+.categoryHeader-function::before { content: '⚡'; font-size: 0.85rem; }
+
+.categoryHeader-number {
+  color: var(--color-number-text);
+  background-color: var(--color-number);
+  border: 2px solid var(--color-number-border);
+}
+.categoryHeader-number::before { content: '🔢'; font-size: 0.85rem; }
+
+.categoryHeader-fun {
+  color: var(--color-fun-text);
+  background-color: var(--color-fun);
+  border: 2px solid var(--color-fun-border);
+}
+.categoryHeader-fun::before { content: '🎉'; font-size: 0.85rem; }
 
 .grid {
   display: flex;

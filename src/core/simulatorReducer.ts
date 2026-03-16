@@ -7,6 +7,7 @@ import {
   Position,
   Direction,
   ExecutionState,
+  CompetitionState,
 } from './types';
 import { placeBlock, removeBlock } from './inventory';
 import { placeBlockOnBoard, removeBlockFromBoard, reorderBlock } from './controlBoard';
@@ -33,9 +34,22 @@ function createInitialExecutionState(
 }
 
 /**
+ * Create the default initial competition state.
+ */
+function createInitialCompetitionState(): CompetitionState {
+  return {
+    active: false,
+    currentSession: null,
+    currentRoundIndex: 0,
+    timeLimit: 180,
+    challengeSet: null,
+  };
+}
+
+/**
  * Create the default initial simulator state.
  * 4x4 grid, bot at (0,0) facing east, default inventory, idle execution,
- * normal speed, zh language, timer disabled.
+ * normal speed, zh language, timer disabled, canvas renderer, competition inactive.
  */
 export function createInitialState(): SimulatorState {
   const botPosition: Position = { row: 0, col: 0 };
@@ -66,6 +80,8 @@ export function createInitialState(): SimulatorState {
       running: false,
     },
     language: 'zh',
+    renderer: 'canvas',
+    competition: createInitialCompetitionState(),
   };
 }
 
@@ -314,6 +330,198 @@ export function simulatorReducer(
           ...state.timer,
           running: false,
         },
+      };
+    }
+
+    case 'SET_RENDERER': {
+      return {
+        ...state,
+        renderer: action.renderer,
+      };
+    }
+
+    case 'ACTIVATE_COMPETITION': {
+      const challengeSet = action.challengeSet;
+      const rounds = challengeSet.challenges.map((entry, index) => ({
+        roundNumber: index + 1,
+        challengeId:
+          entry.type === 'predefined' && entry.challengeConfig
+            ? entry.challengeConfig.id
+            : `random-${index + 1}`,
+        isRandom: entry.type === 'random',
+        score: {
+          goalReached: false,
+          basePoints: 0,
+          collectibleBonus: 0,
+          efficiencyBonus: 0,
+          speedBonus: 0,
+          total: 0,
+        },
+        completed: false,
+        timeUsed: 0,
+      }));
+
+      const session = {
+        id: uuidv4(),
+        date: new Date().toISOString(),
+        challengeSetId: challengeSet.id,
+        challengeSetName: { ...challengeSet.title },
+        tier: challengeSet.tier,
+        rounds,
+        totalScore: 0,
+        starRating: 1 as const,
+      };
+
+      return {
+        ...state,
+        competition: {
+          active: true,
+          currentSession: session,
+          currentRoundIndex: 0,
+          timeLimit: challengeSet.recommendedTimePerChallenge || 180,
+          challengeSet,
+        },
+      };
+    }
+
+    case 'DEACTIVATE_COMPETITION': {
+      return {
+        ...state,
+        competition: createInitialCompetitionState(),
+      };
+    }
+
+    case 'START_ROUND': {
+      if (!state.competition.active || !state.competition.challengeSet) {
+        return state;
+      }
+      const entry =
+        state.competition.challengeSet.challenges[state.competition.currentRoundIndex];
+      if (!entry) {
+        return state;
+      }
+      if (entry.type === 'predefined' && entry.challengeConfig) {
+        const config = entry.challengeConfig;
+        const bp: Position = { row: config.start.row, col: config.start.col };
+        const bd = config.start.direction;
+        const inv: Record<BlockType, number> = {
+          ...DEFAULT_BLOCK_INVENTORY,
+          ...config.blockInventory,
+        };
+        return {
+          ...state,
+          grid: {
+            width: config.grid.width,
+            height: config.grid.height,
+            obstacles: [...config.obstacles],
+            goals: [...config.goals],
+            collectibles: [...config.collectibles],
+          },
+          botPosition: { ...bp },
+          botDirection: bd,
+          botStartPosition: { ...bp },
+          botStartDirection: bd,
+          controlBoard: { lines: [] },
+          blockInventory: inv,
+          execution: createInitialExecutionState(bp, bd),
+          currentChallenge: config,
+          collectedItems: [],
+          timer: {
+            enabled: true,
+            duration: state.competition.timeLimit,
+            remaining: state.competition.timeLimit,
+            running: false,
+          },
+        };
+      }
+      return state;
+    }
+
+    case 'COMPLETE_ROUND': {
+      if (!state.competition.active || !state.competition.currentSession) {
+        return state;
+      }
+      const rounds = [...state.competition.currentSession.rounds];
+      const ri = state.competition.currentRoundIndex;
+      if (ri < rounds.length) {
+        rounds[ri] = {
+          ...rounds[ri],
+          score: action.score,
+          completed: true,
+          timeUsed: state.competition.timeLimit - state.timer.remaining,
+        };
+      }
+      const totalScore = rounds.reduce((sum, r) => sum + r.score.total, 0);
+      return {
+        ...state,
+        competition: {
+          ...state.competition,
+          currentSession: {
+            ...state.competition.currentSession,
+            rounds,
+            totalScore,
+          },
+        },
+      };
+    }
+
+    case 'NEXT_ROUND': {
+      if (!state.competition.active) {
+        return state;
+      }
+      return {
+        ...state,
+        competition: {
+          ...state.competition,
+          currentRoundIndex: state.competition.currentRoundIndex + 1,
+        },
+      };
+    }
+
+    case 'GENERATE_MAZE': {
+      // No-op in reducer — maze generation happens in a side effect
+      return state;
+    }
+
+    case 'LOAD_GENERATED_MAZE': {
+      const config = action.result.config;
+      const bp: Position = { row: config.start.row, col: config.start.col };
+      const bd = config.start.direction;
+      const inv: Record<BlockType, number> = {
+        ...DEFAULT_BLOCK_INVENTORY,
+        ...config.blockInventory,
+      };
+      return {
+        ...state,
+        grid: {
+          width: config.grid.width,
+          height: config.grid.height,
+          obstacles: [...config.obstacles],
+          goals: [...config.goals],
+          collectibles: [...config.collectibles],
+        },
+        botPosition: { ...bp },
+        botDirection: bd,
+        botStartPosition: { ...bp },
+        botStartDirection: bd,
+        controlBoard: { lines: [] },
+        blockInventory: inv,
+        execution: createInitialExecutionState(bp, bd),
+        currentChallenge: config,
+        collectedItems: [],
+        timer: state.competition.active
+          ? {
+              enabled: true,
+              duration: state.competition.timeLimit,
+              remaining: state.competition.timeLimit,
+              running: false,
+            }
+          : {
+              enabled: false,
+              duration: 0,
+              remaining: 0,
+              running: false,
+            },
       };
     }
 

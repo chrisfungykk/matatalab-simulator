@@ -156,6 +156,15 @@ export function parseChallenge(json: string): ChallengeConfig {
     timeLimit = obj.timeLimit as number;
   }
 
+  // generationSeed (optional)
+  let generationSeed: number | undefined;
+  if (obj.generationSeed !== undefined) {
+    if (typeof obj.generationSeed !== 'number') {
+      throw new Error('Invalid challenge: generationSeed must be a number');
+    }
+    generationSeed = obj.generationSeed as number;
+  }
+
   const config: ChallengeConfig = {
     id: obj.id as string,
     title: { zh: title.zh as string, en: title.en as string },
@@ -174,6 +183,10 @@ export function parseChallenge(json: string): ChallengeConfig {
 
   if (timeLimit !== undefined) {
     config.timeLimit = timeLimit;
+  }
+
+  if (generationSeed !== undefined) {
+    config.generationSeed = generationSeed;
   }
 
   return config;

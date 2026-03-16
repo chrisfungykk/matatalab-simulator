@@ -1,0 +1,197 @@
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%);
+  border: 2px solid #ffcc80;
+  border-radius: 12px;
+  font-family: var(--font-family, 'Nunito', sans-serif);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #555;
+  white-space: nowrap;
+}
+
+.input {
+  min-height: var(--min-touch-target, 44px);
+  padding: 8px 10px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: var(--font-family, 'Nunito', sans-serif);
+  width: 120px;
+  background-color: #fff;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+  border-color: #1a73e8;
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select {
+  min-height: var(--min-touch-target, 44px);
+  padding: 8px 10px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: var(--font-family, 'Nunito', sans-serif);
+  background-color: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.select:focus {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+  border-color: #1a73e8;
+}
+
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.generateBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--min-touch-target, 44px);
+  min-width: var(--min-touch-target, 44px);
+  padding: 8px 18px;
+  border: 2px solid #43a047;
+  border-radius: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: var(--font-family, 'Nunito', sans-serif);
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.generateBtn:hover:not(:disabled) {
+  background-color: #43a047;
+  transform: translateY(-1px);
+}
+
+.generateBtn:active:not(:disabled) {
+  background-color: #388e3c;
+  transform: translateY(1px);
+}
+
+.generateBtn:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+.generateBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.exportBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--min-touch-target, 44px);
+  min-width: var(--min-touch-target, 44px);
+  padding: 8px 18px;
+  border: 2px solid #1976d2;
+  border-radius: 10px;
+  background-color: #2196f3;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: var(--font-family, 'Nunito', sans-serif);
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.exportBtn:hover:not(:disabled) {
+  background-color: #1976d2;
+  transform: translateY(-1px);
+}
+
+.exportBtn:active:not(:disabled) {
+  background-color: #1565c0;
+  transform: translateY(1px);
+}
+
+.exportBtn:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+.exportBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.seedDisplay {
+  width: 100%;
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e65100;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .container {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .input {
+    width: 90px;
+  }
+
+  .generateBtn,
+  .exportBtn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ── Touch devices ───────────────────────────────────────────────── */
+
+@media (pointer: coarse) {
+  .input,
+  .select,
+  .generateBtn,
+  .exportBtn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

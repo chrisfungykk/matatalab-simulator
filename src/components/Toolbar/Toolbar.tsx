@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ControlBoardState, SpeedSetting } from '../../core/types';
+import type { ControlBoardState, SpeedSetting, RendererType } from '../../core/types';
 import { serialize, deserialize } from '../../core/serializer';
 import styles from './Toolbar.module.css';
 const SPEED_OPTIONS: SpeedSetting[] = ['slow', 'normal', 'fast'];
@@ -14,6 +14,8 @@ export interface ToolbarProps {
   onTimerTick?: () => void; onTimerExpired?: () => void;
   controlBoard: ControlBoardState; speed: SpeedSetting; language: 'zh' | 'en';
   executionStatus: string; timer?: TimerState;
+  competitionActive?: boolean; onToggleCompetition?: () => void;
+  renderer?: RendererType; onToggleRenderer?: () => void;
 }
 function formatTime(sec: number): string { const m = Math.floor(sec / 60); const s = sec % 60; return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); }
 
@@ -64,8 +66,16 @@ const StartTimerIcon: React.FC = () => (
   </svg>
 );
 
+const TrophyIcon: React.FC = () => (
+  <svg data-testid="button-icon" className={styles.btnIcon} width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <path d="M4 1h8v1h3v3c0 1.1-.9 2-2 2h-.7A4 4 0 0 1 9 9.9V11h2v2H5v-2h2V9.9A4 4 0 0 1 3.7 7H3a2 2 0 0 1-2-2V2h3V1zm-1 2H2v2c0 .6.4 1 1 1h.2A4 4 0 0 1 3 5V3zm10 0h-1v2a4 4 0 0 1-.2 1H13c.6 0 1-.4 1-1V3z" />
+  </svg>
+);
+
 export const Toolbar: React.FC<ToolbarProps> = (props) => {
   const { onRun, onReset, onLoadProgram, onSetSpeed, onSetLanguage, onTimerStart, onTimerStop, onTimerTick, onTimerExpired, controlBoard, speed, language, executionStatus, timer } = props;
+  const { competitionActive, onToggleCompetition } = props;
+  const { renderer, onToggleRenderer } = props;
   const { t, i18n } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [durationInput, setDurationInput] = useState<number>(60);
@@ -159,6 +169,33 @@ export const Toolbar: React.FC<ToolbarProps> = (props) => {
         )}
       </div>
       <div className={styles.separator} role="separator" />
+      {onToggleCompetition && (
+        <>
+          <button
+            data-testid="competition-toggle"
+            className={`${styles.btn} ${competitionActive ? styles.competitionActive : ''}`}
+            onClick={onToggleCompetition}
+            aria-label={t('competition.modeToggle')}
+            aria-pressed={!!competitionActive}
+          >
+            <TrophyIcon /> {competitionActive ? t('competition.competitionMode') : t('competition.freePractice')}
+          </button>
+          <div className={styles.separator} role="separator" />
+        </>
+      )}
+      {onToggleRenderer && (
+        <>
+          <button
+            data-testid="renderer-toggle"
+            className={styles.btn}
+            onClick={onToggleRenderer}
+            aria-label={t('renderer.toggle')}
+          >
+            {renderer === 'canvas' ? t('renderer.canvas') : t('renderer.dom')}
+          </button>
+          <div className={styles.separator} role="separator" />
+        </>
+      )}
       <button data-testid="toolbar-button" className={styles.langBtn} onClick={handleLang}
         aria-label={`${t('ui.language')}: ${language === 'zh' ? 'English' : '中文'}`}>
         <GlobeIcon /> {language === 'zh' ? 'EN' : '中文'}

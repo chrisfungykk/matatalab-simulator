@@ -124,6 +124,7 @@ describe('BlockAppearance - Property 4: Block 3D appearance invariants', () => {
       fc.property(
         fc.constantFrom(...ALL_BLOCK_TYPES),
         (blockType: BlockType) => {
+          i18n.changeLanguage('en');
           const { container } = render(
             <I18nextProvider i18n={i18n}>
               <DndContext>
@@ -179,6 +180,7 @@ describe('BlockAppearance - Property 5: Zero-count blocks are visually disabled'
       fc.property(
         fc.constantFrom(...ALL_BLOCK_TYPES),
         (blockType: BlockType) => {
+          i18n.changeLanguage('en');
           // Build inventory: target block has count 0, all others have count 1
           const inv = fullInventory();
           inv[blockType] = 0;

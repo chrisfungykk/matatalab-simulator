@@ -39,6 +39,19 @@
   }
 }
 
+/* Bouncy block placement — overshoot 115% then settle (Requirement 5.6) */
+@keyframes bouncy-place {
+  0% {
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 /* Block removal — fade and shrink (Requirement 5.4) */
 @keyframes fade-shrink {
   0% {
